@@ -9,6 +9,7 @@ import { HospitalCard, HospitalCardLarge } from "@/components/HospitalCard";
 import { SearchBar } from "@/components/SearchBar";
 import { DemandHeatmap } from "@/components/DemandHeatmap";
 import { FAQ } from "@/components/FAQ";
+import { FAQ_ITEMS } from "@/lib/faq-data";
 
 
 
@@ -539,6 +540,25 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* FAQ structured data for Google rich snippets */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: FAQ_ITEMS.map((item) => ({
+              "@type": "Question",
+              name: item.question,
+              acceptedAnswer: {
+                "@type": "Answer",
+                text: item.answer,
+              },
+            })),
+          }),
+        }}
+      />
     </div>
   );
 }
