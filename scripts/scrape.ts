@@ -19,6 +19,22 @@ async function main() {
     }
   }
 
+  // Remove hospitals that are no longer valid A&E/UTC/MIU departments. The live DB
+  // persists across runs (via cache), so retiring an entry from the seed is not enough —
+  // we must delete any already-seeded row and its readings here.
+  const RETIRED_SLUGS = [
+    "sandwell-general-hospital", // A&E closed 2024; replaced by Midland Metropolitan University Hospital
+    "princess-alexandra-hospital-sdec", // SDEC has no published live wait; produced bogus readings
+  ];
+  for (const slug of RETIRED_SLUGS) {
+    const row = db.prepare("SELECT id FROM hospitals WHERE slug = ?").get(slug) as { id: string } | undefined;
+    if (row) {
+      db.prepare("DELETE FROM wait_readings WHERE hospital_id = ?").run(row.id);
+      db.prepare("DELETE FROM hospitals WHERE id = ?").run(row.id);
+      console.log(`  Retired obsolete hospital: ${slug}`);
+    }
+  }
+
   const results = await runAllScrapers();
 
   let totalUpdated = 0;

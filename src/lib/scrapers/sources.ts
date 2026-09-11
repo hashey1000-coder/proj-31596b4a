@@ -140,7 +140,9 @@ export const SOURCES: SourceConfig[] = [
     hospitals: [
       { siteKey: "Emergency Department (Adults)", name: "Princess Alexandra Hospital", slug: "princess-alexandra-hospital" },
       { siteKey: "Children's Emergency Department", name: "Princess Alexandra Hospital Children's A&E", slug: "princess-alexandra-hospital-childrens-ae" },
-      { siteKey: "Same Day Emergency Care", name: "Princess Alexandra Hospital SDEC", slug: "princess-alexandra-hospital-sdec" },
+      // SDEC removed: the trust publishes no live SDEC wait — the "Same Day Emergency Care"
+      // heading is only a disclaimer paragraph, so matching it scraped a bogus wait from the
+      // adjacent adult-ED figures.
     ],
   },
 
@@ -164,7 +166,9 @@ export const SOURCES: SourceConfig[] = [
     region: "West Midlands",
     hospitals: [
       { siteKey: "Midland Metropolitan", name: "Midland Metropolitan University Hospital", slug: "midland-metropolitan-university-hospital" },
-      { siteKey: "Sandwell", name: "Sandwell General Hospital", slug: "sandwell-general-hospital" },
+      // Sandwell General A&E closed in 2024 when Midland Metropolitan University Hospital
+      // opened and consolidated the City and Sandwell emergency departments. The trust's
+      // live page no longer lists it.
     ],
   },
   {

@@ -75,7 +75,7 @@ export async function scrapeSource(config: SourceConfig): Promise<{
   return { success: errors.length === 0 || hospitalsUpdated > 0, hospitalsUpdated, errors };
 }
 
-function parseJson(body: string, config: SourceConfig): ParsedWaitTime[] {
+export function parseJson(body: string, config: SourceConfig): ParsedWaitTime[] {
   const results: ParsedWaitTime[] = [];
   try {
     const data = JSON.parse(body);
@@ -103,7 +103,7 @@ function parseJson(body: string, config: SourceConfig): ParsedWaitTime[] {
   return results;
 }
 
-function parsePlainText(body: string, config: SourceConfig): ParsedWaitTime[] {
+export function parsePlainText(body: string, config: SourceConfig): ParsedWaitTime[] {
   const text = body.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
   const waitMinutes = parseWaitText(text);
   const mapping = config.hospitals[0];
@@ -117,7 +117,7 @@ function parsePlainText(body: string, config: SourceConfig): ParsedWaitTime[] {
   }];
 }
 
-function parseHtmlTable(body: string, config: SourceConfig): ParsedWaitTime[] {
+export function parseHtmlTable(body: string, config: SourceConfig): ParsedWaitTime[] {
   const $ = cheerio.load(body);
   const results: ParsedWaitTime[] = [];
 
@@ -218,7 +218,7 @@ function parseWaitNearLabel(text: string): number | null {
   return null;
 }
 
-function parseHtmlEmbedded(body: string, config: SourceConfig): ParsedWaitTime[] {
+export function parseHtmlEmbedded(body: string, config: SourceConfig): ParsedWaitTime[] {
   const $ = cheerio.load(body);
   const results: ParsedWaitTime[] = [];
 
@@ -284,7 +284,7 @@ function parseHtmlEmbedded(body: string, config: SourceConfig): ParsedWaitTime[]
   return results;
 }
 
-function parseGeneric(body: string, config: SourceConfig): ParsedWaitTime[] {
+export function parseGeneric(body: string, config: SourceConfig): ParsedWaitTime[] {
   const $ = cheerio.load(body);
   const results: ParsedWaitTime[] = [];
 
@@ -314,7 +314,11 @@ function parseGeneric(body: string, config: SourceConfig): ParsedWaitTime[] {
         if (!normText.includes(norm(mapping.siteKey))) continue;
         const waitMinutes = parseWaitText(text);
         if (waitMinutes === null) continue;
-        const closed = /\bclosed\b/i.test(text);
+        // Ignore "closed" mentions inside X-ray schedule notes — the Cornwall MIU pages
+        // list X-ray hours like "Closed X-Ray:" or "Open X-Ray: Closed on Sunday", which
+        // are not the unit's own status. Only skip on a genuine unit closure/reopening.
+        const statusText = text.replace(/(?:open|closed)\s*x-?ray:[^.]*\.?/gi, " ");
+        const closed = /\bcurrently closed\b|\breopening on\b|\bclosed\b/i.test(statusText);
         candidates.push({
           text, slug: mapping.slug, name: mapping.name,
           wait: waitMinutes, type: mapping.type, len: textLen, closed,
@@ -363,7 +367,7 @@ function parseGeneric(body: string, config: SourceConfig): ParsedWaitTime[] {
   return results;
 }
 
-function parseWaitText(text: string): number | null {
+export function parseWaitText(text: string): number | null {
   if (!text) return null;
 
   const rangeMatch = text.match(/(\d+)\s*(?:hours?|hrs?)\s*(?:(\d+)\s*(?:minutes?|mins?))?\s*-\s*(\d+)\s*(?:hours?|hrs?)\s*(?:(\d+)\s*(?:minutes?|mins?))?/i);
