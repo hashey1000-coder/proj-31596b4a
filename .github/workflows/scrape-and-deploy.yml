@@ -1,0 +1,47 @@
+name: Scrape & Deploy
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+jobs:
+  scrape-build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      - name: Restore database
+        uses: actions/cache/restore@v4
+        with:
+          path: data/aewaittime.db
+          key: db-${{ github.run_id }}
+          restore-keys: db-
+
+      - name: Run scrapers
+        run: npx tsx scripts/scrape.ts
+
+      - name: Save database
+        uses: actions/cache/save@v4
+        with:
+          path: data/aewaittime.db
+          key: db-${{ github.run_id }}
+
+      - name: Build static site
+        run: npm run build
+
+      - name: Deploy via FTP
+        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
+        with:
+          server: ${{ secrets.FTP_HOST }}
+          username: ${{ secrets.FTP_USER }}
+          password: ${{ secrets.FTP_PASS }}
+          local-dir: out/
+          server-dir: ${{ secrets.FTP_DIR }}
