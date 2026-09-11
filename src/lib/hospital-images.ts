@@ -287,6 +287,36 @@ export const HOSPITAL_IMAGES: Record<string, string> = {
   // QEQM Margate - same as queen-elizabeth-queen-mother-hospital-margate
   "qeqm-hospital-margate":
     "https://upload.wikimedia.org/wikipedia/commons/8/8a/QEQM_Hospital%2C_Margate_-_geograph.org.uk_-_991371.jpg",
+  "causeway-area-hospital":
+    "https://upload.wikimedia.org/wikipedia/commons/7/70/Causeway_Hospital_-_geograph.org.uk_-_1154836.jpg",
+  "herne-bay-utc":
+    "https://upload.wikimedia.org/wikipedia/commons/2/2f/Queen_Victoria_Memorial_Hospital%2C_Herne_Bay_-_geograph.org.uk_-_1334586.jpg",
+  "kings-mill-hospital":
+    "https://upload.wikimedia.org/wikipedia/commons/6/60/King%27s_Mill_Hospital_and_Reservoir_cropped.JPG",
+  "kingsbridge-miu":
+    "https://upload.wikimedia.org/wikipedia/commons/d/d2/Kingsbridge_Community_Hospital_%28geograph_5930428%29.jpg",
+  "liskeard-miu":
+    "https://upload.wikimedia.org/wikipedia/commons/3/39/Liskeard_Community_Hospital_-_geograph.org.uk_-_171788.jpg",
+  "newton-abbot-community-hospital":
+    "https://upload.wikimedia.org/wikipedia/commons/b/b6/Newton_Abbot_Community_Hospital.jpg",
+  "north-manchester-general-hospital":
+    "https://upload.wikimedia.org/wikipedia/commons/f/f0/North_Manchester_General_Hospital_-_geograph.org.uk_-_3747034.jpg",
+  "omagh-hospital-and-primary-care-complex":
+    "https://upload.wikimedia.org/wikipedia/commons/f/f5/Omagh_Hospital_%26_Primary_Care_Complex_%28geograph_5969491%29.jpg",
+  "royal-victoria-hospital":
+    "https://upload.wikimedia.org/wikipedia/commons/f/f3/Royal_Victoria_Hospital_in_Belfast.jpg",
+  "st-jamess-university-hospital":
+    "https://upload.wikimedia.org/wikipedia/commons/4/4b/St_James%27s_University_Hospital%2C_Leeds_-_geograph.org.uk_-_5016174.jpg",
+  "ulster-hospital":
+    "https://upload.wikimedia.org/wikipedia/commons/3/3b/Ulster_Hospital%2C_Dundonald_-_geograph.org.uk_-_791361.jpg",
+  "university-hospital-coventry-childrens-ae":
+    "https://upload.wikimedia.org/wikipedia/commons/4/47/University_Hospital_Coventry%2C_main_entrance_4.21.jpg",
+  "university-hospital-coventry-emergency-gynaecology":
+    "https://upload.wikimedia.org/wikipedia/commons/4/47/University_Hospital_Coventry%2C_main_entrance_4.21.jpg",
+  "university-hospital-coventry-miu":
+    "https://upload.wikimedia.org/wikipedia/commons/4/47/University_Hospital_Coventry%2C_main_entrance_4.21.jpg",
+  "wythenshawe-hospital":
+    "https://upload.wikimedia.org/wikipedia/commons/2/2d/UHSMentrance.jpg",
 };
 
 export function getHospitalImage(slug: string): string | null {
