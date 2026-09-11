@@ -35,7 +35,6 @@ async function main() {
   }
 
   // Prune readings older than 7 days to keep DB size manageable
-  const db = getDb();
   const pruned = db
     .prepare("DELETE FROM wait_readings WHERE scraped_at < datetime('now', '-7 days')")
     .run();
