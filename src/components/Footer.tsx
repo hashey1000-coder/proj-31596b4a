@@ -11,7 +11,7 @@ export function Footer() {
             </h2>
             <ul className="space-y-2.5 text-sm text-white/75">
               <li>
-                <Link href="/hospitals/derriford-hospital-plymouth" className="hover:text-white transition-colors">
+                <Link href="/hospitals/derriford-hospital" className="hover:text-white transition-colors">
                   Derriford Hospital
                 </Link>
               </li>

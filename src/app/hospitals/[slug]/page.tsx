@@ -40,9 +40,11 @@ export async function generateMetadata({
   const { slug } = await params;
   const hospital = getHospitalBySlug(slug);
   if (!hospital) return { title: "Hospital Not Found" };
+  const dept =
+    hospital.type === "UTC" ? "UTC" : hospital.type === "MIU" ? "MIU" : "A&E";
   return {
-    title: `${hospital.name} — Current A&E Queue & Department Info`,
-    description: `See the latest A&E queue length at ${hospital.name} in ${hospital.city}, sourced from ${hospital.trust_name}. Compare with nearby hospitals.`,
+    title: `${hospital.name} — Current ${dept} Queue & Department Info`,
+    description: `See the latest ${dept} queue length at ${hospital.name} in ${hospital.city}, sourced from ${hospital.trust_name}. Compare with nearby hospitals.`,
   };
 }
 
@@ -158,7 +160,13 @@ export default async function HospitalDetailPage({
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div className="flex-1">
             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-              {hospital.name} — Current A&E Queue
+              {hospital.name} — Current{" "}
+              {hospital.type === "UTC"
+                ? "UTC"
+                : hospital.type === "MIU"
+                  ? "MIU"
+                  : "A&E"}{" "}
+              Queue
             </h1>
 
             {/* Also known as */}
@@ -345,7 +353,11 @@ export default async function HospitalDetailPage({
               <div>
                 <dt className="text-gray-500">Type</dt>
                 <dd className="text-gray-900 mt-0.5">
-                  {hospital.type === "UTC" ? "Urgent Treatment Centre" : "Accident & Emergency (Type 1)"}
+                  {hospital.type === "UTC"
+                    ? "Urgent Treatment Centre"
+                    : hospital.type === "MIU"
+                      ? "Minor Injuries Unit"
+                      : "Accident & Emergency (Type 1)"}
                 </dd>
               </div>
             </dl>
@@ -588,7 +600,8 @@ function generateHospitalFaqs(hospital: {
   postcode: string | null;
 }) {
   const faqs: { q: string; a: string }[] = [];
-  const deptLabel = hospital.type === "UTC" ? "UTC" : "A&E";
+  const deptLabel =
+    hospital.type === "UTC" ? "UTC" : hospital.type === "MIU" ? "MIU" : "A&E";
 
   faqs.push({
     q: `How long is the queue at ${hospital.name} right now?`,
