@@ -165,7 +165,7 @@ export function HospitalsTable({
                       )}
                     </td>
                     <td className="px-6 py-4 text-right text-sm text-gray-600">
-                      {hospital.patients_waiting ?? "—"}
+                      {hospital.patients_waiting ?? hospital.total_patients ?? "—"}
                     </td>
                   </tr>
                 );
