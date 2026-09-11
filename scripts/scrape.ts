@@ -1,8 +1,23 @@
 import { runAllScrapers } from "../src/lib/scrapers";
 import { getDb } from "../src/lib/db";
+import fs from "fs";
+import path from "path";
 
 async function main() {
   console.log(`[${new Date().toISOString()}] Starting scrape…`);
+
+  const db = getDb();
+  const hospitalCount = (db.prepare("SELECT COUNT(*) as c FROM hospitals").get() as { c: number }).c;
+  if (hospitalCount === 0) {
+    const seedPath = path.join(process.cwd(), "data", "seed.sql");
+    if (fs.existsSync(seedPath)) {
+      console.log("  Seeding database with hospital data…");
+      const seed = fs.readFileSync(seedPath, "utf-8");
+      db.exec(seed);
+      const seeded = (db.prepare("SELECT COUNT(*) as c FROM hospitals").get() as { c: number }).c;
+      console.log(`  Seeded ${seeded} hospitals`);
+    }
+  }
 
   const results = await runAllScrapers();
 
