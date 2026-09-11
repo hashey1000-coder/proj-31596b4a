@@ -3,7 +3,13 @@ name: Scrape & Deploy
 on:
   schedule:
     - cron: "*/30 * * * *"
+  push:
+    branches: [main]
   workflow_dispatch:
+
+concurrency:
+  group: deploy
+  cancel-in-progress: true
 
 jobs:
   scrape-build-deploy:
@@ -37,11 +43,44 @@ jobs:
       - name: Build static site
         run: npm run build
 
-      - name: Deploy via FTP
-        uses: SamKirkland/FTP-Deploy-Action@v4.4.0
-        with:
-          server: ${{ secrets.FTP_HOST }}
-          username: ${{ secrets.FTP_USER }}
-          password: ${{ secrets.FTP_PASS }}
-          local-dir: out/
-          server-dir: ${{ secrets.FTP_DIR }}
+      - name: Setup SSH
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_SSH_KEY: ${{ secrets.CPANEL_SSH_KEY }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT }}
+        run: |
+          set -euo pipefail
+          SSH_PORT="${CPANEL_SSH_PORT:-2239}"
+
+          mkdir -p ~/.ssh
+          printf '%s\n' "$CPANEL_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+
+          ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null
+
+          ssh \
+            -i ~/.ssh/id_ed25519 \
+            -o IdentitiesOnly=yes \
+            -o PreferredAuthentications=publickey \
+            -o PubkeyAuthentication=yes \
+            -o BatchMode=yes \
+            -o ConnectTimeout=15 \
+            -p "$SSH_PORT" \
+            "$CPANEL_USER@$CPANEL_HOST" true
+
+      - name: Deploy to cPanel
+        env:
+          CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
+          CPANEL_USER: ${{ secrets.CPANEL_USER }}
+          CPANEL_SSH_PORT: ${{ secrets.CPANEL_SSH_PORT }}
+          CPANEL_TARGET_DIR: ${{ secrets.CPANEL_TARGET_DIR }}
+        run: |
+          set -euo pipefail
+          SSH_PORT="${CPANEL_SSH_PORT:-2239}"
+          TARGET="${CPANEL_TARGET_DIR}"
+
+          SSH_OPTS="-i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15"
+
+          shopt -s dotglob
+          scp $SSH_OPTS -P "$SSH_PORT" -r out/* "$CPANEL_USER@$CPANEL_HOST:$TARGET/"
