@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 
 interface HospitalData {
@@ -45,7 +44,6 @@ export function NearMeClient({
 }: {
   hospitals: HospitalData[];
 }) {
-  const searchParams = useSearchParams();
   const [userLat, setUserLat] = useState<number | null>(null);
   const [userLng, setUserLng] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -65,15 +63,16 @@ export function NearMeClient({
   }, [hospitals, userLat, userLng]);
 
   useEffect(() => {
-    const lat = searchParams.get("lat");
-    const lng = searchParams.get("lng");
-    const pc = searchParams.get("postcode");
+    const params = new URLSearchParams(window.location.search);
+    const lat = params.get("lat");
+    const lng = params.get("lng");
+    const pc = params.get("postcode");
     if (lat && lng) {
       setLocationLabel(pc ? pc.toUpperCase() : "Your location");
       setUserLat(parseFloat(lat));
       setUserLng(parseFloat(lng));
     }
-  }, [searchParams]);
+  }, []);
 
   function findNearby() {
     if (!navigator.geolocation) {

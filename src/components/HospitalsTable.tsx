@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import type { HospitalWithWait } from "@/lib/data/hospitals";
 import { formatWaitTime, waitSeverity, severityDotColor } from "@/lib/utils";
@@ -9,13 +8,13 @@ import { formatWaitTime, waitSeverity, severityDotColor } from "@/lib/utils";
 export function HospitalsTable({
   hospitals,
   nationalAvg,
+  initialQuery = "",
 }: {
   hospitals: HospitalWithWait[];
   nationalAvg: number;
+  initialQuery?: string;
 }) {
-  const searchParams = useSearchParams();
-  const initialQ = searchParams.get("q") || "";
-  const [query, setQuery] = useState(initialQ);
+  const [query, setQuery] = useState(initialQuery);
 
   const normalize = (s: string) => s.toLowerCase().replace(/['']/g, "");
 

@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getAllHospitalsWithWaits } from "@/lib/data/hospitals";
 import { getTypicalWaitForTrust } from "@/lib/nhs-england-stats";
@@ -36,9 +35,5 @@ export default function NearMePage() {
       };
     });
 
-  return (
-    <Suspense>
-      <NearMeClient hospitals={hospitals} />
-    </Suspense>
-  );
+  return <NearMeClient hospitals={hospitals} />;
 }
