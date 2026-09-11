@@ -137,7 +137,22 @@ export default async function HospitalDetailPage({
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent" />
             </div>
-          ) : null;
+          ) : (
+            <div className="relative h-36 md:h-48 w-full bg-gradient-to-br from-[#005EB8]/10 via-[#005EB8]/5 to-gray-50 flex items-center justify-center">
+              <svg viewBox="0 0 120 80" fill="none" className="w-32 h-20 opacity-30">
+                <rect x="30" y="20" width="60" height="50" rx="4" stroke="#005EB8" strokeWidth="2" />
+                <rect x="45" y="5" width="30" height="55" rx="2" stroke="#005EB8" strokeWidth="2" />
+                <rect x="54" y="12" width="12" height="4" rx="1" fill="#005EB8" />
+                <rect x="58" y="8" width="4" height="12" rx="1" fill="#005EB8" />
+                <rect x="38" y="30" width="10" height="10" rx="1.5" fill="#005EB8" opacity="0.3" />
+                <rect x="55" y="30" width="10" height="10" rx="1.5" fill="#005EB8" opacity="0.3" />
+                <rect x="72" y="30" width="10" height="10" rx="1.5" fill="#005EB8" opacity="0.3" />
+                <rect x="38" y="46" width="10" height="10" rx="1.5" fill="#005EB8" opacity="0.3" />
+                <rect x="72" y="46" width="10" height="10" rx="1.5" fill="#005EB8" opacity="0.3" />
+                <rect x="55" y="50" width="10" height="20" rx="2" fill="#005EB8" opacity="0.5" />
+              </svg>
+            </div>
+          );
         })()}
         <div className="p-6 md:p-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">

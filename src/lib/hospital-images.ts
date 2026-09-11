@@ -317,6 +317,10 @@ export const HOSPITAL_IMAGES: Record<string, string> = {
     "https://upload.wikimedia.org/wikipedia/commons/4/47/University_Hospital_Coventry%2C_main_entrance_4.21.jpg",
   "wythenshawe-hospital":
     "https://upload.wikimedia.org/wikipedia/commons/2/2d/UHSMentrance.jpg",
+  "falmouth-miu":
+    "https://upload.wikimedia.org/wikipedia/commons/7/78/Falmouth_Hospital_%2823949528135%29.jpg",
+  "stratton-miu":
+    "https://upload.wikimedia.org/wikipedia/commons/f/f3/Stratton_hospital_-_geograph.org.uk_-_5547123.jpg",
 };
 
 export function getHospitalImage(slug: string): string | null {
