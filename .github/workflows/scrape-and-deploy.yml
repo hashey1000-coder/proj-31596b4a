@@ -19,10 +19,13 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: 22
           cache: npm
 
       - run: npm ci
+
+      - name: Ensure data directory
+        run: mkdir -p data
 
       - name: Restore database
         uses: actions/cache/restore@v4
