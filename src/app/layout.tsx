@@ -32,6 +32,9 @@ export const metadata: Metadata = {
     description:
       "Side-by-side A&E wait comparisons for every NHS hospital. Find the shortest queue near you right now.",
   },
+  verification: {
+    google: "K_1Hvuo70slWVcn8-4-xctVbM2KbVh_tO--P6DN-KHM",
+  },
   robots: {
     index: true,
     follow: true,
