@@ -30,7 +30,8 @@ async function main() {
     `[${new Date().toISOString()}] Done — ${totalUpdated} hospitals updated, ${totalErrors} errors`
   );
 
-  process.exit(totalErrors > 0 ? 1 : 0);
+  const allFailed = results.every((r) => !r.success);
+  process.exit(allFailed ? 1 : 0);
 }
 
 main();
