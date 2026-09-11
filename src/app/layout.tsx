@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   },
   description:
     "See how long you will wait at every NHS A&E department right now. Side-by-side hospital comparisons, postcode search, regional breakdowns and 24-hour trend data for the whole of the UK.",
-  metadataBase: new URL("https://www.aewaittime.co.uk"),
+  metadataBase: new URL("https://aewaittimes.uk"),
   openGraph: {
     type: "website",
     locale: "en_GB",

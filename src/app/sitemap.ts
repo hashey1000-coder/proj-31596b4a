@@ -5,7 +5,7 @@ import { GUIDES } from "@/lib/guides";
 export const dynamic = "force-static";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://www.aewaittime.co.uk";
+  const baseUrl = "https://aewaittimes.uk";
   const now = new Date();
 
   const staticPages: MetadataRoute.Sitemap = [

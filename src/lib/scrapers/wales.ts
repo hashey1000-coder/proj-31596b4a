@@ -25,7 +25,7 @@ export async function scrapeWales(): Promise<{
     const response = await fetch(SOURCE_URL, {
       headers: {
         "User-Agent":
-          "AEWaitTime/1.0 (+https://aewaittime.example.com; independent NHS wait time aggregator)",
+          "AEWaitTime/1.0 (+https://aewaittimes.uk; independent NHS wait time aggregator)",
       },
     });
 
