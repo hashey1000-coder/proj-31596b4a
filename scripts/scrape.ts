@@ -35,6 +35,18 @@ async function main() {
     }
   }
 
+  // One-off data corrections for rows already persisted in the live DB.
+  const CORRECTIONS: { slug: string; column: "city" | "region"; value: string }[] = [
+    { slug: "herne-bay-utc", column: "city", value: "Herne Bay" }, // city was missing
+    { slug: "tunbridge-wells-hospital", column: "region", value: "Kent" }, // was "South East", inconsistent with other Kent units
+  ];
+  for (const c of CORRECTIONS) {
+    const res = db
+      .prepare(`UPDATE hospitals SET ${c.column} = ?, updated_at = datetime('now') WHERE slug = ? AND (${c.column} IS NULL OR ${c.column} != ?)`)
+      .run(c.value, c.slug, c.value);
+    if (res.changes > 0) console.log(`  Corrected ${c.slug}.${c.column} → ${c.value}`);
+  }
+
   const results = await runAllScrapers();
 
   let totalUpdated = 0;

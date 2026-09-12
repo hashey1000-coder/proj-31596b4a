@@ -74,6 +74,13 @@ export async function scrapeNorthernIreland(): Promise<{
           const waitText = $(cells[waitCol]).text().trim();
           const waitMinutes = parseWait(waitText);
 
+          // Column 2 publishes the real opening hours (e.g. "Open Mon-Fri
+          // 9.00 am-5.00 pm") — capture them instead of assuming 24/7.
+          const hoursText =
+            cells.length > 2
+              ? $(cells[1]).text().trim().replace(/\s+/g, " ").slice(0, 120)
+              : "";
+
           const patientsText =
             cells.length > 3 ? $(cells[3]).text().trim() : "";
           const patientsWaiting = parseInt(patientsText) || null;
@@ -104,8 +111,15 @@ export async function scrapeNorthernIreland(): Promise<{
                 hospitalId, name, slug, type, "Northern Ireland",
                 "Northern Ireland", trustId,
                 coords.lat || null, coords.lng || null,
-                coords.city || null, "Open: 24 hours, 7 days a week"
+                coords.city || null, hoursText || null
               );
+            }
+
+            // Keep opening hours in sync with the source on every run
+            if (hoursText) {
+              db.prepare(
+                "UPDATE hospitals SET opening_hours = ?, updated_at = datetime('now') WHERE id = ? AND (opening_hours IS NULL OR opening_hours != ?)"
+              ).run(hoursText, hospitalId, hoursText);
             }
 
             db.prepare(

@@ -21,6 +21,8 @@ export interface ParsedWaitTime {
   patientsWaiting?: number | null;
   totalPatients?: number | null;
   type?: "AE" | "MIU" | "UTC";
+  /** Opening hours text published alongside the wait (e.g. Cornwall's "Open: Every day, 8am to 8pm.") */
+  openingHours?: string | null;
 }
 
 export const SOURCES: SourceConfig[] = [

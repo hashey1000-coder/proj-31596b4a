@@ -63,6 +63,12 @@ export async function scrapeSource(config: SourceConfig): Promise<{
           `INSERT INTO wait_readings (id, hospital_id, wait_minutes, patients_waiting, total_patients, source_timestamp, freshness)
            VALUES (?, ?, ?, ?, ?, datetime('now'), 'live')`
         ).run(generateId(), hospitalId, p.waitMinutes, p.patientsWaiting ?? null, p.totalPatients ?? null);
+        // Keep opening hours in sync when the source publishes them
+        if (p.openingHours) {
+          db.prepare(
+            "UPDATE hospitals SET opening_hours = ?, updated_at = datetime('now') WHERE id = ? AND (opening_hours IS NULL OR opening_hours != ?)"
+          ).run(p.openingHours, hospitalId, p.openingHours);
+        }
         hospitalsUpdated++;
       } catch (err) {
         errors.push(`${p.hospitalName}: ${err instanceof Error ? err.message : String(err)}`);
@@ -343,11 +349,17 @@ export function parseGeneric(body: string, config: SourceConfig): ParsedWaitTime
     if (isChildrens(c.text) && candidates.some(o => o.slug === c.slug && !isChildrens(o.text) && o.wait !== null)) continue;
     seen.add(c.slug);
     if (c.closed) continue;
+    // Capture opening hours when the source publishes them alongside the wait
+    // (Cornwall's blocks read "Open: Every day, 8am to 8pm. Walk in or…").
+    const openMatch = c.text
+      .replace(/\s+/g, " ")
+      .match(/Open:\s*([^.]{3,100}\.)/);
     results.push({
       hospitalSlug: c.slug,
       hospitalName: c.name,
       waitMinutes: c.wait,
       type: c.type,
+      openingHours: openMatch ? `Open: ${openMatch[1].trim()}` : null,
     });
   }
 
