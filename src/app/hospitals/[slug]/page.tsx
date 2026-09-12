@@ -42,9 +42,12 @@ export async function generateMetadata({
   if (!hospital) return { title: "Hospital Not Found" };
   const dept =
     hospital.type === "UTC" ? "UTC" : hospital.type === "MIU" ? "MIU" : "A&E";
+  const imageUrl = getHospitalImage(slug) || hospital.image_url;
   return {
     title: `${hospital.name} — Current ${dept} Queue & Department Info`,
     description: `See the latest ${dept} queue length at ${hospital.name} in ${hospital.city}, sourced from ${hospital.trust_name}. Compare with nearby hospitals.`,
+    alternates: { canonical: `/hospitals/${slug}/` },
+    openGraph: imageUrl ? { images: [{ url: imageUrl }] } : undefined,
   };
 }
 

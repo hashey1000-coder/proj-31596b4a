@@ -39,9 +39,10 @@ export const metadata: Metadata = {
     index: true,
     follow: true,
   },
-  alternates: {
-    canonical: "/",
-  },
+  // NOTE: no `alternates.canonical` here — a canonical set in the root layout
+  // is inherited by every page, pointing them all at "/" and telling search
+  // engines the whole site is a duplicate of the homepage. Each page sets its
+  // own canonical instead.
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

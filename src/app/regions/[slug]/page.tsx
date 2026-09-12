@@ -34,6 +34,7 @@ export async function generateMetadata({
   return {
     title: `${region} — Live A&E Wait Times`,
     description: `Current A&E waiting times at NHS hospitals in ${region}.`,
+    alternates: { canonical: `/regions/${slug}/` },
   };
 }
 

@@ -6,6 +6,7 @@ export const metadata: Metadata = {
   title: "All NHS Hospitals — A&E Wait Times",
   description:
     "Browse live A&E waiting times at every NHS hospital we track across the UK.",
+  alternates: { canonical: "/hospitals/" },
 };
 
 export default function HospitalsPage() {

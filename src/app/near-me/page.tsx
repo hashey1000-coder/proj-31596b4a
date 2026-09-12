@@ -7,6 +7,7 @@ export const metadata: Metadata = {
   title: "A&E Near Me — Compare Queues by Distance",
   description:
     "Enter a postcode or share your location to see every NHS A&E department nearby, ranked by distance with current queue lengths.",
+  alternates: { canonical: "/near-me/" },
 };
 
 export default function NearMePage() {

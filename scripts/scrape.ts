@@ -36,9 +36,13 @@ async function main() {
   }
 
   // One-off data corrections for rows already persisted in the live DB.
-  const CORRECTIONS: { slug: string; column: "city" | "region"; value: string }[] = [
+  const CORRECTIONS: { slug: string; column: "city" | "region" | "lat" | "lng"; value: string | number }[] = [
     { slug: "herne-bay-utc", column: "city", value: "Herne Bay" }, // city was missing
     { slug: "tunbridge-wells-hospital", column: "region", value: "Kent" }, // was "South East", inconsistent with other Kent units
+    // Queen Victoria Memorial Hospital, King Edward Avenue, Herne Bay CT6 6EB —
+    // without coordinates the unit is invisible to near-me and nearby lists.
+    { slug: "herne-bay-utc", column: "lat", value: 51.3688 },
+    { slug: "herne-bay-utc", column: "lng", value: 1.1315 },
   ];
   for (const c of CORRECTIONS) {
     const res = db

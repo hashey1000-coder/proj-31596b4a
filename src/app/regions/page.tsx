@@ -7,6 +7,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Browse A&E Waits by Region",
   description: "Browse current A&E waiting times across UK regions.",
+  alternates: { canonical: "/regions/" },
 };
 
 export default function RegionsPage() {

@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Patient Guides — Navigate NHS Emergency Services With Confidence",
   description: "Plain-English guides to help you pick the right NHS service, arrive prepared and spend less time waiting. Independently written, regularly reviewed.",
+  alternates: { canonical: "/guides/" },
 };
 
 export default function GuidesPage() {

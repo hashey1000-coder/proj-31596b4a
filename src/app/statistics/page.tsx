@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Live A&E Statistics — National Wait Time Dashboard",
   description:
     "Real-time statistics across all tracked NHS A&E departments. Average wait, median, distribution, busiest and quietest departments right now.",
+  alternates: { canonical: "/statistics/" },
 };
 
 function formatWait(minutes: number): string {

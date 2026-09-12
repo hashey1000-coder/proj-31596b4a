@@ -18,6 +18,7 @@ export async function generateMetadata({
   return {
     title: guide.title,
     description: guide.description,
+    alternates: { canonical: `/guides/${slug}/` },
   };
 }
 

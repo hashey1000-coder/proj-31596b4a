@@ -5,6 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "FAQ — Common Questions About A&E Queues in the UK",
   description: "Quick answers about NHS A&E queue lengths, triage priorities, data sources and when an Urgent Treatment Centre might be a better option.",
+  alternates: { canonical: "/faq/" },
 };
 
 export default function FAQPage() {

@@ -1,10 +1,15 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import {
   getAllHospitalsWithWaits,
   getLongestWaits,
   getShortestWaits,
   getRegions,
 } from "@/lib/data/hospitals";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 import { HospitalCard, HospitalCardLarge } from "@/components/HospitalCard";
 import { SearchBar } from "@/components/SearchBar";
 import { DemandHeatmap } from "@/components/DemandHeatmap";
