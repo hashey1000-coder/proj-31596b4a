@@ -76,6 +76,12 @@ async function main() {
     `[${new Date().toISOString()}] Done — ${totalUpdated} hospitals updated, ${totalErrors} errors`
   );
 
+  // Checkpoint the WAL into the main DB file and close cleanly. Without this,
+  // this run's inserts live only in aewaittime.db-wal — and CI caches just
+  // aewaittime.db, silently losing every reading and breaking 24h history.
+  db.pragma("wal_checkpoint(TRUNCATE)");
+  db.close();
+
   const allFailed = results.every((r) => !r.success);
   process.exit(allFailed ? 1 : 0);
 }

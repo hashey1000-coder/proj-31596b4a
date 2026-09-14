@@ -65,15 +65,15 @@ export default async function HospitalDetailPage({
 
   const allHospitals = getAllHospitalsWithWaits();
   const nationalAvg = getNationalStats().avgWait;
+  // Nearest departments by distance, capped at 100 km so a hospital in a
+  // sparse area never recommends "alternatives" hundreds of kilometres away.
+  // Hospitals without live data still appear — a real A&E 40 km away is a
+  // better suggestion than one across the country that happens to have a feed.
   const nearby =
     hospital.lat && hospital.lng
       ? allHospitals
           .filter(
-            (h) =>
-              h.id !== hospital.id &&
-              h.lat !== null &&
-              h.lng !== null &&
-              h.wait_minutes !== null
+            (h) => h.id !== hospital.id && h.lat !== null && h.lng !== null
           )
           .map((h) => ({
             ...h,
@@ -84,6 +84,7 @@ export default async function HospitalDetailPage({
               h.lng!
             ),
           }))
+          .filter((h) => h.distance <= 100)
           .sort((a, b) => a.distance - b.distance)
           .slice(0, 5)
       : [];
@@ -494,7 +495,7 @@ export default async function HospitalDetailPage({
                             </span>
                           )}
                         </div>
-                        {h.wait_minutes !== null && (
+                        {h.wait_minutes !== null ? (
                           <div className="text-right">
                             <div className="flex items-center gap-1">
                               <span
@@ -508,6 +509,17 @@ export default async function HospitalDetailPage({
                             <p className="text-xs text-gray-400">
                               ~ {formatWaitTime(h.wait_minutes)}
                             </p>
+                          </div>
+                        ) : (
+                          <div className="text-right">
+                            <span className="text-xs text-gray-400">
+                              No live data
+                            </span>
+                            {h.avg_wait !== null && (
+                              <p className="text-xs text-gray-500 mt-0.5">
+                                Avg: {h.avg_wait} min
+                              </p>
+                            )}
                           </div>
                         )}
                       </div>

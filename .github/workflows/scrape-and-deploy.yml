@@ -30,7 +30,10 @@ jobs:
       - name: Restore database
         uses: actions/cache/restore@v4
         with:
-          path: data/aewaittime.db
+          path: |
+            data/aewaittime.db
+            data/aewaittime.db-wal
+            data/aewaittime.db-shm
           key: db-${{ github.run_id }}
           restore-keys: db-
 
@@ -40,7 +43,10 @@ jobs:
       - name: Save database
         uses: actions/cache/save@v4
         with:
-          path: data/aewaittime.db
+          path: |
+            data/aewaittime.db
+            data/aewaittime.db-wal
+            data/aewaittime.db-shm
           key: db-${{ github.run_id }}
 
       - name: Build static site
