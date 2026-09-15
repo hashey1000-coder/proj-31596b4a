@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { Fragment, useState, useEffect, useMemo } from "react";
 import Link from "next/link";
+import { AdSlot } from "@/components/AdSlot";
 
 interface HospitalData {
   id: string;
@@ -282,10 +283,11 @@ export function NearMeClient({
               const hasLive = h.wait_minutes !== null;
               const hasTypical = h.typical_wait !== null;
               const displayWait = h.wait_minutes ?? h.typical_wait;
+              const showAdAfter = (i + 1) % 5 === 0 && i < nearby.length - 1;
 
               return (
+                <Fragment key={h.id}>
                 <Link
-                  key={h.id}
                   href={`/hospitals/${h.slug}`}
                   className={`block rounded-xl border p-5 hover:shadow-md transition-all ${
                     hasLive
@@ -365,6 +367,8 @@ export function NearMeClient({
                     </div>
                   </div>
                 </Link>
+                {showAdAfter && <AdSlot />}
+                </Fragment>
               );
             })}
           </div>

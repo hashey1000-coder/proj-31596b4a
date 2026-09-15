@@ -15,6 +15,7 @@ import {
 } from "@/lib/utils";
 import { getHospitalImage } from "@/lib/hospital-images";
 import { HospitalHistory } from "@/components/HospitalHistory";
+import { AdSlot } from "@/components/AdSlot";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -308,6 +309,8 @@ export default async function HospitalDetailPage({
             </div>
           )}
 
+          <AdSlot />
+
           {/* Hospital Details */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -440,6 +443,8 @@ export default async function HospitalDetailPage({
               </Link>
             )}
           </div>
+
+          <AdSlot />
 
           {/* Hospital-specific FAQ */}
           {hospitalFaqs.length > 0 && (

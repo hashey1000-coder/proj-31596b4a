@@ -1,6 +1,8 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGuideBySlug, GUIDES } from "@/lib/guides";
+import { AdSlot } from "@/components/AdSlot";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -64,7 +66,12 @@ export default async function GuidePage({
             <p className="text-gray-600 mb-6">{guide.description}</p>
 
             <div className="border-t border-gray-100 pt-6 guide-content">
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(guide.content) }} />
+              {splitForAds(markdownToHtml(guide.content)).map((segment, i, arr) => (
+                <Fragment key={i}>
+                  <div dangerouslySetInnerHTML={{ __html: segment }} />
+                  {i < arr.length - 1 && <AdSlot />}
+                </Fragment>
+              ))}
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-2 text-xs text-gray-400">
@@ -116,6 +123,28 @@ export default async function GuidePage({
       </div>
     </div>
   );
+}
+
+/**
+ * Split rendered guide HTML into segments at every 2nd <h2>, so a repeated
+ * in-article ad can sit between sections without ever interrupting one.
+ */
+function splitForAds(html: string, everyNthH2 = 2): string[] {
+  const parts = html.split(/(?=<h2>)/);
+  if (parts.length <= everyNthH2) return [html];
+  const segments: string[] = [];
+  let buffer = parts[0];
+  let h2Count = 0;
+  for (let i = 1; i < parts.length; i++) {
+    buffer += parts[i];
+    h2Count++;
+    if (h2Count % everyNthH2 === 0 && i < parts.length - 1) {
+      segments.push(buffer);
+      buffer = "";
+    }
+  }
+  if (buffer) segments.push(buffer);
+  return segments;
 }
 
 function inlineFormat(text: string): string {
