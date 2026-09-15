@@ -1,19 +1,8 @@
-import { Fragment } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getHospitalsByRegion, getRegions, getNationalStats } from "@/lib/data/hospitals";
 import { formatWaitTime, waitSeverity, severityDotColor } from "@/lib/utils";
-import { AdSlot } from "@/components/AdSlot";
 import type { Metadata } from "next";
-
-/** Break the hospital grid with an in-content ad after every N cards */
-const AD_EVERY_N_CARDS = 12;
-
-function chunk<T>(arr: T[], size: number): T[][] {
-  const out: T[][] = [];
-  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-  return out;
-}
 
 export function generateStaticParams() {
   const regions = getRegions();
@@ -102,11 +91,8 @@ export default async function RegionPage({
         </p>
       )}
 
-      {chunk(sorted, AD_EVERY_N_CARDS).map((group, gi) => (
-      <Fragment key={gi}>
-      {gi > 0 && <AdSlot />}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {group.map((hospital) => {
+        {sorted.map((hospital) => {
           const severity = waitSeverity(hospital.wait_minutes);
           return (
             <Link
@@ -158,8 +144,6 @@ export default async function RegionPage({
           );
         })}
       </div>
-      </Fragment>
-      ))}
     </div>
   );
 }

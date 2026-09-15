@@ -15,7 +15,6 @@ import { SearchBar } from "@/components/SearchBar";
 import { DemandHeatmap } from "@/components/DemandHeatmap";
 import { FAQ } from "@/components/FAQ";
 import { FAQ_ITEMS } from "@/lib/faq-data";
-import { AdSlot } from "@/components/AdSlot";
 
 
 
@@ -276,10 +275,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <AdSlot />
-      </section>
-
       {/* Fastest Departments */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-6">
@@ -491,10 +486,6 @@ export default function HomePage() {
             </span>
           </div>
         </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <AdSlot />
       </section>
 
       {/* FAQ */}

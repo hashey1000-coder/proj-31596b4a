@@ -1,13 +1,9 @@
 "use client";
 
-import { Fragment, useState, useMemo } from "react";
+import { useState, useMemo } from "react";
 import Link from "next/link";
 import type { HospitalWithWait } from "@/lib/data/hospitals";
 import { formatWaitTime, waitSeverity, severityDotColor } from "@/lib/utils";
-import { AdSlot } from "@/components/AdSlot";
-
-/** Insert an in-content ad row after every N hospitals */
-const AD_EVERY_N_ROWS = 25;
 
 export function HospitalsTable({
   hospitals,
@@ -105,13 +101,11 @@ export function HospitalsTable({
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {sorted.map((hospital, idx) => {
+              {sorted.map((hospital) => {
                 const severity = waitSeverity(hospital.wait_minutes);
-                const showAdAfter =
-                  (idx + 1) % AD_EVERY_N_ROWS === 0 && idx < sorted.length - 1;
                 return (
-                  <Fragment key={hospital.id}>
                   <tr
+                    key={hospital.id}
                     className="hover:bg-gray-50 transition-colors"
                   >
                     <td className="px-6 py-4">
@@ -173,14 +167,6 @@ export function HospitalsTable({
                       {hospital.patients_waiting ?? hospital.total_patients ?? "—"}
                     </td>
                   </tr>
-                  {showAdAfter && (
-                    <tr>
-                      <td colSpan={5} className="px-6">
-                        <AdSlot />
-                      </td>
-                    </tr>
-                  )}
-                  </Fragment>
                 );
               })}
             </tbody>
