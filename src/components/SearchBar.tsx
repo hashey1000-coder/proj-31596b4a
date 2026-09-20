@@ -125,7 +125,9 @@ export function SearchBar({
             onFocus={() => setShowResults(true)}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSubmit();
+              if (e.key === "Escape") setShowResults(false);
             }}
+            aria-label="Search hospital name or postcode"
             className="w-full rounded-xl border border-gray-300 bg-white pl-10 pr-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#005EB8] focus:border-transparent shadow-sm"
           />
         </div>

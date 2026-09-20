@@ -30,22 +30,22 @@ export function HospitalHistory({
         {hospitalName} A&E Wait Times — Last 24 Hours
       </h2>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="w-full text-sm" aria-label={`${hospitalName} wait time readings over the last 24 hours`}>
           <thead>
             <tr className="border-b border-gray-200">
-              <th className="pb-2 text-left text-xs font-semibold text-gray-500 uppercase">
+              <th scope="col" className="pb-2 text-left text-xs font-semibold text-gray-500 uppercase">
                 Time
               </th>
-              <th className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
+              <th scope="col" className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
                 Typical Time in Dept
               </th>
-              <th className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
+              <th scope="col" className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
                 Change
               </th>
-              <th className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
+              <th scope="col" className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
                 Patients
               </th>
-              <th className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
+              <th scope="col" className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
                 Total in Dept
               </th>
             </tr>

@@ -7,7 +7,7 @@ export const FAQ_ITEMS: FAQItem[] = [
   {
     question: "Where do you get A&E wait data from?",
     answer:
-      "Every figure is pulled from the public dashboard that each NHS Trust maintains for its own patients, or from the official statistical publications released by NHS England, NHS Wales, NHS Scotland and HSC Northern Ireland. We never estimate or model a number ourselves. Each entry on the site is labelled with its source and a timestamp so you can judge freshness before you set off.",
+      "Live figures are pulled unaltered from the public dashboard that each NHS Trust maintains for its own patients. Where a trust publishes no live feed, we show a clearly-labelled typical wait estimated from NHS England's official monthly statistics instead. Each entry on the site is labelled with its source and a timestamp so you can judge freshness before you set off.",
   },
   {
     question: "When are A&E departments least crowded?",

@@ -326,3 +326,21 @@ export const HOSPITAL_IMAGES: Record<string, string> = {
 export function getHospitalImage(slug: string): string | null {
   return HOSPITAL_IMAGES[slug] ?? null;
 }
+
+// Wikimedia originals can be enormous (worst tracked: 21 MB) and they render
+// into a ~256px-tall hero banner. Rewrite originals to the sized-thumbnail
+// endpoint so pages ship ~100-250 KB instead. URLs already in /thumb/ form and
+// non-Wikimedia hosts (Geograph — all under 1.5 MB) pass through unchanged.
+const WIKI_ORIGINAL =
+  /^https:\/\/upload\.wikimedia\.org\/wikipedia\/(commons|en)\/([0-9a-f])\/([0-9a-f]{2})\/([^/]+)$/;
+
+export function optimizedImageUrl(
+  url: string | null | undefined,
+  width = 960
+): string | null {
+  if (!url) return null;
+  if (url.includes("/thumb/")) return url;
+  const m = url.match(WIKI_ORIGINAL);
+  if (!m) return url;
+  return `https://upload.wikimedia.org/wikipedia/${m[1]}/thumb/${m[2]}/${m[3]}/${m[4]}/${width}px-${m[4]}`;
+}

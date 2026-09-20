@@ -1,0 +1,35 @@
+# Deployed to the site root with every build (Next.js copies public/ into out/).
+# The host is LiteSpeed (Apache-compatible), deployed via additive scp — files
+# removed from the build are never deleted remotely, so retired pages are
+# tombstoned here with 410s.
+
+# ── Force HTTPS ──────────────────────────────────────────────────────────────
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+<IfModule mod_headers.c>
+  # HSTS — only meaningful on HTTPS responses
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
+
+  # Content-hashed Next.js assets (all JS/CSS/fonts live under /_next/static)
+  <FilesMatch "\.(js|css|woff2)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+
+  # HTML carries live wait data refreshed every 30 min — always revalidate
+  # (cheap 304s via Last-Modified, never heuristic-stale)
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+  <FilesMatch "\.(xml|txt)$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# ── Tombstones for files removed from the build (scp never deletes) ─────────
+# Sandwell General's A&E closed in 2024; PAH SDEC publishes no live wait.
+Redirect gone /hospitals/sandwell-general-hospital/
+Redirect gone /hospitals/princess-alexandra-hospital-sdec/
+# Left over from a reverted ads experiment
+Redirect gone /ads.txt

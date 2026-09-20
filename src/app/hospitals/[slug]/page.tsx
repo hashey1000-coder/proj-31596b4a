@@ -13,7 +13,7 @@ import {
   severityDotColor,
   haversineDistance,
 } from "@/lib/utils";
-import { getHospitalImage } from "@/lib/hospital-images";
+import { getHospitalImage, optimizedImageUrl } from "@/lib/hospital-images";
 import { HospitalHistory } from "@/components/HospitalHistory";
 import type { Metadata } from "next";
 
@@ -42,7 +42,7 @@ export async function generateMetadata({
   if (!hospital) return { title: "Hospital Not Found" };
   const dept =
     hospital.type === "UTC" ? "UTC" : hospital.type === "MIU" ? "MIU" : "A&E";
-  const imageUrl = getHospitalImage(slug) || hospital.image_url;
+  const imageUrl = optimizedImageUrl(getHospitalImage(slug) || hospital.image_url);
   return {
     title: `${hospital.name} — Current ${dept} Queue & Department Info`,
     description: `See the latest ${dept} queue length at ${hospital.name} in ${hospital.city}, sourced from ${hospital.trust_name}. Compare with nearby hospitals.`,
@@ -129,7 +129,7 @@ export default async function HospitalDetailPage({
       {/* Header */}
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden mb-8">
         {(() => {
-          const imageUrl = getHospitalImage(slug) || hospital.image_url;
+          const imageUrl = optimizedImageUrl(getHospitalImage(slug) || hospital.image_url);
           return imageUrl ? (
             <div className="relative h-48 md:h-64 w-full">
               <Image
@@ -175,7 +175,7 @@ export default async function HospitalDetailPage({
 
             {/* Also known as */}
             {hospital.aliases && (
-              <p className="text-sm text-gray-400 mt-1">
+              <p className="text-sm text-gray-500 mt-1">
                 Also known as: {hospital.aliases}
               </p>
             )}
@@ -242,15 +242,15 @@ export default async function HospitalDetailPage({
               </>
             ) : (
               <div>
-                <p className="text-lg text-gray-400">Live wait unavailable</p>
+                <p className="text-lg text-gray-500">Live wait unavailable</p>
                 <div className="mt-2">
                   <p className="text-xs text-gray-500 uppercase tracking-wider">
                     {hospital.avg_wait !== null ? "Average" : "National Average"}
                   </p>
-                  <p className="text-3xl font-bold text-gray-400">
+                  <p className="text-3xl font-bold text-gray-500">
                     {hospital.avg_wait ?? nationalAvg}
                   </p>
-                  <p className="text-sm text-gray-400">minutes</p>
+                  <p className="text-sm text-gray-500">minutes</p>
                 </div>
               </div>
             )}
@@ -482,7 +482,7 @@ export default async function HospitalDetailPage({
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <p className="text-xs text-gray-400 mb-0.5">
+                          <p className="text-xs text-gray-500 mb-0.5">
                             {h.distance.toFixed(1)} km
                           </p>
                           <p className="text-sm font-medium text-gray-900">
@@ -504,15 +504,15 @@ export default async function HospitalDetailPage({
                               <span className="text-sm font-bold text-gray-900">
                                 {h.wait_minutes}
                               </span>
-                              <span className="text-xs text-gray-400">min</span>
+                              <span className="text-xs text-gray-500">min</span>
                             </div>
-                            <p className="text-xs text-gray-400">
+                            <p className="text-xs text-gray-500">
                               ~ {formatWaitTime(h.wait_minutes)}
                             </p>
                           </div>
                         ) : (
                           <div className="text-right">
-                            <span className="text-xs text-gray-400">
+                            <span className="text-xs text-gray-500">
                               No live data
                             </span>
                             {h.avg_wait !== null && (

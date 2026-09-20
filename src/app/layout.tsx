@@ -49,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-GB" data-scroll-behavior="smooth" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-gray-50 text-gray-900">
-        <Header />
+        <Header builtAt={new Date().toISOString()} />
         <main className="flex-1">{children}</main>
         <Footer />
         <ScrollToTop />

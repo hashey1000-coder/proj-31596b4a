@@ -214,7 +214,7 @@ If you step away from the waiting area — to use the bathroom, get fresh air, o
 
 ## After treatment
 
-### 10. Ask clear discharge questions
+### 13. Ask clear discharge questions
 
 Before you leave, make sure you understand:
 
@@ -226,7 +226,7 @@ Before you leave, make sure you understand:
 
 Getting clear answers at discharge prevents unnecessary return visits, which saves both your time and the department's capacity. Our guide on [what happens after A&E discharge](/guides/after-ae-discharge/) covers follow-up care in detail.
 
-### 11. Understand your rights while waiting
+### 14. Understand your rights while waiting
 
 You have the right to pain relief while waiting, to be informed about your triage category, and to speak up if your condition changes. If your symptoms worsen in the waiting room, tell the triage nurse immediately — you will be re-assessed. Our [patient rights guide](/guides/ae-patient-rights/) explains what you are entitled to throughout your visit.
 
@@ -367,7 +367,7 @@ A&E involves multiple sequential waits, and the total time is rarely under two h
     content: `
 ## What the numbers show
 
-NHS England publishes hourly attendance counts for every major A&E department, and we supplement that with our own real-time tracking data from hospital dashboards across the UK. When you combine these sources over months and years, a remarkably consistent weekly rhythm emerges. While individual hospitals can deviate from the average — a department near a stadium will spike on match days, a coastal hospital will see summer surges — the overall patterns hold true across the vast majority of departments.
+NHS England publishes monthly attendance statistics for every major A&E department, and we supplement that with our own tracking data, which genuinely is collected around the clock from hospital dashboards across the UK. When you combine these sources over months and years, a remarkably consistent weekly rhythm emerges. While individual hospitals can deviate from the average — a department near a stadium will spike on match days, a coastal hospital will see summer surges — the overall patterns hold true across the vast majority of departments.
 
 Understanding these patterns matters because, for conditions that are urgent but not immediately life-threatening, timing your arrival can easily shave an hour or more off your total visit. If you are uncertain whether your condition is urgent enough for A&E in the first place, read our guide on [A&E vs UTC](/guides/ae-or-utc/) before deciding where to go.
 
@@ -1137,7 +1137,7 @@ Some hospitals then expose this data externally: on their website, through a pub
 
 We query each hospital's public data source at regular intervals — typically every 15 to 30 minutes. The timestamp you see ("Refreshed: 15 min ago") tells you when we last successfully retrieved data from that hospital. If a hospital's feed goes down, we show the last known reading with a note about its age.
 
-We do not modify, adjust or model the data. What the hospital publishes is what you see. We add context — the freshness indicator, the delta from the previous reading, regional averages — but the core wait-time figure comes directly from the trust.
+Live dashboard figures are shown unaltered; clearly-labelled typical waits are our own estimates derived from NHS England's monthly statistics. What the hospital publishes is what you see. We add context — the freshness indicator, the delta from the previous reading, regional averages — but the core wait-time figure comes directly from the trust.
 
 ## What the number tells you — and what it does not
 

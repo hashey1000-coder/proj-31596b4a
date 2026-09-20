@@ -7,14 +7,15 @@ import {
   getRegions,
 } from "@/lib/data/hospitals";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-};
 import { HospitalCard, HospitalCardLarge } from "@/components/HospitalCard";
 import { SearchBar } from "@/components/SearchBar";
 import { DemandHeatmap } from "@/components/DemandHeatmap";
 import { FAQ } from "@/components/FAQ";
 import { FAQ_ITEMS } from "@/lib/faq-data";
+
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+};
 
 
 
@@ -36,7 +37,15 @@ export default function HomePage() {
 
   const hospitalsWithData = allHospitals.filter((h) => h.wait_minutes !== null);
   const totalTracked = allHospitals.length;
-  const latestTimestamp = hospitalsWithData[0]?.source_timestamp;
+  // Most recent update across ALL hospitals — [0] would be alphabetical and
+  // could show a single stalled feed's age as the whole site's freshness.
+  const latestTimestamp = hospitalsWithData.reduce<string | undefined>(
+    (max, h) =>
+      h.source_timestamp && (!max || h.source_timestamp > max)
+        ? h.source_timestamp
+        : max,
+    undefined
+  );
 
   return (
     <div className="space-y-16 pb-16">
@@ -59,25 +68,20 @@ export default function HomePage() {
                 pulled directly from each trust&apos;s own public dashboard.
               </p>
 
-              {/* Social proof */}
-              <div className="mt-5 flex items-center gap-3">
-                <div className="flex -space-x-1">
-                  {["bg-blue-400", "bg-green-400", "bg-purple-400", "bg-amber-400"].map((c, i) => (
-                    <div key={i} className={`w-7 h-7 rounded-full ${c} border-2 border-white flex items-center justify-center text-white text-[10px] font-bold`}>
-                      {String.fromCharCode(65 + i * 5)}
-                    </div>
-                  ))}
-                </div>
-                <div className="text-sm">
-                  <div className="flex items-center gap-1">
-                    {[1,2,3,4,5].map((s) => (
-                      <svg key={s} className="w-3.5 h-3.5 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                      </svg>
-                    ))}
-                    <span className="text-xs text-gray-500 ml-1">Used by thousands of patients every week</span>
-                  </div>
-                </div>
+              {/* Data provenance strip */}
+              <div className="mt-5 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-gray-600">
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[#005EB8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                  </svg>
+                  Every figure links to its official NHS source
+                </span>
+                <span className="flex items-center gap-1.5">
+                  <svg className="w-4 h-4 text-[#005EB8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+                  </svg>
+                  Refreshed every 30 minutes
+                </span>
               </div>
 
               <div className="mt-8 max-w-xl">
@@ -440,19 +444,12 @@ export default function HomePage() {
                 <span className="inline-flex items-center gap-1 text-xs font-medium bg-green-100 text-green-700 px-1.5 py-0.5 rounded">
                   Live
                 </span>{" "}
-                ,{" "}
-                <span className="text-xs font-medium bg-blue-100 text-blue-700 px-1.5 py-0.5 rounded">
-                  Latest published
+                when they come straight from a trust dashboard, or{" "}
+                <span className="text-xs font-medium bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded">
+                  Typical wait
                 </span>{" "}
-                ,{" "}
-                <span className="text-xs font-medium bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded">
-                  Monthly average
-                </span>{" "}
-                or{" "}
-                <span className="text-xs font-medium bg-yellow-100 text-yellow-700 px-1.5 py-0.5 rounded">
-                  Estimated
-                </span>{" "}
-                — so there is no ambiguity about age.
+                when they are our estimate from NHS England&apos;s monthly
+                statistics — and hospitals with neither say so plainly.
               </p>
             </div>
             <div className="bg-gray-50 rounded-xl p-5">
@@ -473,16 +470,16 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Review Badge */}
+          {/* Source note */}
           <div className="mt-6 pt-6 border-t border-gray-100 flex items-center gap-3">
-            <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 rounded-full border border-green-200">
-              <svg className="w-4 h-4 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-blue-50 rounded-full border border-blue-200">
+              <svg className="w-4 h-4 text-[#005EB8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244" />
               </svg>
-              <span className="text-xs font-medium text-green-700">Reviewed for accuracy</span>
+              <span className="text-xs font-medium text-[#005EB8]">Source-linked</span>
             </div>
-            <span className="text-xs text-gray-400">
-              Methodology and editorial content are periodically reviewed by healthcare professionals.
+            <span className="text-xs text-gray-500">
+              Every wait figure on this site links back to the NHS trust page or official publication it came from, so you can check it yourself.
             </span>
           </div>
         </div>

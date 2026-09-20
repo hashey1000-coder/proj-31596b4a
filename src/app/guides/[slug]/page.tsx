@@ -49,12 +49,12 @@ export default async function GuidePage({
               <span className="px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#005EB8]/10 text-[#005EB8]">
                 {guide.category}
               </span>
-              <span className="text-xs text-gray-400">{guide.readTime}</span>
-              <span className="flex items-center gap-1 text-xs text-green-700 bg-green-50 px-2 py-0.5 rounded-full">
+              <span className="text-xs text-gray-500">{guide.readTime}</span>
+              <span className="flex items-center gap-1 text-xs text-[#005EB8] bg-[#005EB8]/10 px-2 py-0.5 rounded-full">
                 <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                  <path d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
+                  <path d="M12 6.042A8.967 8.967 0 0 0 6 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 0 1 6 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 0 1 6-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0 0 18 18a8.967 8.967 0 0 0-6 2.292m0-14.25v14.25" />
                 </svg>
-                Clinically reviewed
+                Based on NHS guidance
               </span>
             </div>
 
@@ -67,11 +67,11 @@ export default async function GuidePage({
               <div dangerouslySetInnerHTML={{ __html: markdownToHtml(guide.content) }} />
             </div>
 
-            <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-2 text-xs text-gray-400">
+            <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-2 text-xs text-gray-500">
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                 <path d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285Z" />
               </svg>
-              Last clinically reviewed: {guide.lastReviewed}. This guide is for general information only and is not a substitute for professional medical advice.
+              Last reviewed against published NHS guidance: {guide.lastReviewed}. This guide has not been reviewed by a clinician. It is general information only and is not a substitute for professional medical advice.
             </div>
           </div>
         </article>

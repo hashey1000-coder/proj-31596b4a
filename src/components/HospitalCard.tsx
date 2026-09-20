@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { formatWaitTime, waitSeverity, severityDotColor } from "@/lib/utils";
 import type { HospitalWithWait } from "@/lib/data/hospitals";
-import { getHospitalImage } from "@/lib/hospital-images";
+import { getHospitalImage, optimizedImageUrl } from "@/lib/hospital-images";
 
 function HospitalPlaceholder({ name }: { name: string }) {
   const initials = name
@@ -28,7 +28,7 @@ export function HospitalCard({
   nationalAvg?: number;
 }) {
   const severity = waitSeverity(hospital.wait_minutes);
-  const imageUrl = getHospitalImage(hospital.slug) || hospital.image_url;
+  const imageUrl = optimizedImageUrl(getHospitalImage(hospital.slug) || hospital.image_url);
 
   return (
     <div className="rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 h-full bg-white">
@@ -84,7 +84,7 @@ export function HospitalCard({
               </div>
             ) : (
               <div>
-                <span className="text-xs text-gray-400">Live wait unavailable</span>
+                <span className="text-xs text-gray-500">Live wait unavailable</span>
                 <p className="text-xs text-gray-500 mt-1">
                   {hospital.avg_wait !== null ? (
                     <>Avg: <span className="font-semibold">{hospital.avg_wait} min</span></>
@@ -95,7 +95,7 @@ export function HospitalCard({
               </div>
             )}
             {hospital.wait_minutes !== null && (
-              <p className="text-[10px] text-gray-400 mt-0.5">
+              <p className="text-[10px] text-gray-500 mt-0.5">
                 ~ {formatWaitTime(hospital.wait_minutes)}
               </p>
             )}
@@ -114,7 +114,7 @@ export function HospitalCardLarge({
   nationalAvg?: number;
 }) {
   const severity = waitSeverity(hospital.wait_minutes);
-  const imageUrl = getHospitalImage(hospital.slug) || hospital.image_url;
+  const imageUrl = optimizedImageUrl(getHospitalImage(hospital.slug) || hospital.image_url);
 
   return (
     <div className="rounded-2xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-200 hover:shadow-md hover:-translate-y-0.5 h-full bg-white">
@@ -168,14 +168,14 @@ export function HospitalCardLarge({
                   <p className="text-xl font-bold text-gray-900">
                     {hospital.wait_minutes}
                   </p>
-                  <p className="text-xs text-gray-400">min</p>
+                  <p className="text-xs text-gray-500">min</p>
                 </>
               ) : (
                 <>
-                  <p className="text-xl font-bold text-gray-400">
+                  <p className="text-xl font-bold text-gray-500">
                     {hospital.avg_wait ?? nationalAvg ?? "—"}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-500">
                     {hospital.avg_wait !== null ? "avg min" : nationalAvg ? "nat. avg" : ""}
                   </p>
                 </>

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const NAV_ITEMS = [
   { label: "Home", href: "/" },
@@ -20,8 +20,24 @@ const COUNTRIES = [
   { label: "Northern Ireland", href: "/regions/northern-ireland" },
 ];
 
-export function Header() {
+export function Header({ builtAt }: { builtAt?: string }) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // The page is rebuilt every ~30 min; if this copy is much older than that,
+  // the feeds indicator must not claim to be live. Ticks once a minute.
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    // Intentional one-shot sync after mount: the clock must only start on the
+    // client, otherwise the SSR HTML and first client render disagree.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
+  const dataFresh =
+    !builtAt || now === null
+      ? true
+      : now - new Date(builtAt).getTime() < 90 * 60_000;
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
@@ -41,14 +57,25 @@ export function Header() {
                 </Link>
               ))}
             </div>
-            <div className="flex items-center gap-1.5">
-              <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
-              </span>
-              <span className="text-xs text-green-700 font-medium">
-                data feeds active
-              </span>
+            <div className="flex items-center gap-1.5" suppressHydrationWarning>
+              {dataFresh ? (
+                <>
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+                  </span>
+                  <span className="text-xs text-green-700 font-medium">
+                    data feeds active
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-500" />
+                  <span className="text-xs text-amber-700 font-medium">
+                    data update delayed
+                  </span>
+                </>
+              )}
             </div>
           </div>
         </div>
@@ -94,6 +121,10 @@ export function Header() {
               className="md:hidden p-2 rounded-lg hover:bg-gray-100"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
+              aria-controls="mobile-menu"
+              onKeyDown={(e) => {
+                if (e.key === "Escape") setMenuOpen(false);
+              }}
             >
               <svg className="w-5 h-5 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 {menuOpen ? (
@@ -109,7 +140,7 @@ export function Header() {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div className="md:hidden border-t border-gray-200 bg-white">
+        <div id="mobile-menu" className="md:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-4 space-y-1">
             {NAV_ITEMS.map((item) => (
               <Link

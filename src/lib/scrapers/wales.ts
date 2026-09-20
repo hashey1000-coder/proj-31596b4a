@@ -27,6 +27,7 @@ export async function scrapeWales(): Promise<{
         "User-Agent":
           "AEWaitTime/1.0 (+https://aewaittimes.uk; independent NHS wait time aggregator)",
       },
+      signal: AbortSignal.timeout(25_000),
     });
 
     if (!response.ok) {

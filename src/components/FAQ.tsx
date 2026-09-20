@@ -13,25 +13,33 @@ export function FAQ() {
           key={i}
           className="border border-gray-200 rounded-xl bg-white overflow-hidden"
         >
-          <button
-            onClick={() => setOpenIndex(openIndex === i ? null : i)}
-            className="w-full px-5 py-4 text-left flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors"
-            aria-expanded={openIndex === i}
-          >
-            <h3 className="text-sm font-semibold text-gray-900">{item.question}</h3>
-            <svg
-              className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${
-                openIndex === i ? "rotate-180" : ""
-              }`}
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
+          <h3 className="text-sm font-semibold text-gray-900">
+            <button
+              onClick={() => setOpenIndex(openIndex === i ? null : i)}
+              className="w-full px-5 py-4 text-left flex items-center justify-between gap-4 hover:bg-gray-50 transition-colors font-semibold"
+              aria-expanded={openIndex === i}
+              aria-controls={`faq-panel-${i}`}
             >
-              <path d="m6 9 6 6 6-6" />
-            </svg>
-          </button>
+              <span>{item.question}</span>
+              <svg
+                className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-200 ${
+                  openIndex === i ? "rotate-180" : ""
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+                aria-hidden="true"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </button>
+          </h3>
+          {/* Answers stay in the DOM for crawlers; aria-hidden keeps collapsed
+              panels out of the screen-reader flow so aria-expanded is truthful */}
           <div
+            id={`faq-panel-${i}`}
+            aria-hidden={openIndex !== i}
             className={`overflow-hidden transition-[max-height] duration-200 ${
               openIndex === i ? "max-h-96" : "max-h-0"
             }`}

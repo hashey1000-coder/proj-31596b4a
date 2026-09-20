@@ -122,14 +122,14 @@ export default async function RegionPage({
                         {hospital.wait_minutes}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-400">min</p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-500">min</p>
+                    <p className="text-xs text-gray-500">
                       ~ {formatWaitTime(hospital.wait_minutes)}
                     </p>
                   </div>
                 ) : (
                   <div className="text-right">
-                    <span className="text-xs text-gray-400">Live wait unavailable</span>
+                    <span className="text-xs text-gray-500">Live wait unavailable</span>
                     <p className="text-xs text-gray-500 mt-0.5">
                       {hospital.avg_wait !== null ? (
                         <>Avg: <span className="font-semibold">{hospital.avg_wait} min</span></>

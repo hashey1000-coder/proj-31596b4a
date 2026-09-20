@@ -15,8 +15,11 @@ export async function scrapeSource(config: SourceConfig): Promise<{
   let hospitalsUpdated = 0;
 
   try {
+    // 25s cap per source — without it, one hanging NHS server stalls the
+    // whole sequential scrape (observed: a single stalled host added 5+ min).
     const response = await fetch(config.sourceUrl, {
       headers: { "User-Agent": USER_AGENT },
+      signal: AbortSignal.timeout(25_000),
     });
 
     if (!response.ok) {
@@ -59,6 +62,27 @@ export async function scrapeSource(config: SourceConfig): Promise<{
     for (const p of parsed) {
       try {
         const hospitalId = ensureHospital(db, p, config, trustId);
+        // Plausibility guard: a single mis-rendered source page shouldn't
+        // pollute history. Reject a reading that jumps to more than 3x the
+        // previous one AND rises by over 4 hours within one scrape interval.
+        if (p.waitMinutes !== null) {
+          const prev = db
+            .prepare(
+              "SELECT wait_minutes FROM wait_readings WHERE hospital_id = ? AND wait_minutes IS NOT NULL ORDER BY scraped_at DESC LIMIT 1"
+            )
+            .get(hospitalId) as { wait_minutes: number } | undefined;
+          if (
+            prev &&
+            prev.wait_minutes > 0 &&
+            p.waitMinutes > prev.wait_minutes * 3 &&
+            p.waitMinutes - prev.wait_minutes > 240
+          ) {
+            errors.push(
+              `${p.hospitalName}: rejected implausible jump ${prev.wait_minutes} -> ${p.waitMinutes} min`
+            );
+            continue;
+          }
+        }
         db.prepare(
           `INSERT INTO wait_readings (id, hospital_id, wait_minutes, patients_waiting, total_patients, source_timestamp, freshness)
            VALUES (?, ?, ?, ?, ?, datetime('now'), 'live')`
@@ -199,6 +223,13 @@ export function parseHtmlTable(body: string, config: SourceConfig): ParsedWaitTi
       }
     }
 
+    // The Kent feed stamps each block with its own "Last updated" time, and
+    // individual units can silently freeze for days (observed: Faversham two
+    // days stale while every other unit was current). Skip blocks whose own
+    // stamp is older than 6 hours rather than presenting them as live.
+    const staleness = parseSourceTimestampAge(sectionEl.text());
+    if (staleness !== null && staleness > 6 * 60) return;
+
     if (waitMinutes !== null || patientsWaiting !== null) {
       results.push({
         hospitalSlug: mapping.slug,
@@ -211,6 +242,44 @@ export function parseHtmlTable(body: string, config: SourceConfig): ParsedWaitTi
   });
 
   return results;
+}
+
+const MONTHS: Record<string, number> = {
+  january: 0, february: 1, march: 2, april: 3, may: 4, june: 5,
+  july: 6, august: 7, september: 8, october: 9, november: 10, december: 11,
+};
+
+/**
+ * Parse a source's own "Last updated: 15:43, Friday 18.09.2026" /
+ * "Last updated: 09:27, Sunday, 20 September 2026" stamp and return its age
+ * in minutes, or null when no stamp can be parsed (callers must treat null
+ * as "unknown, keep the reading").
+ */
+export function parseSourceTimestampAge(text: string): number | null {
+  const m = text.match(
+    /Last\s+updated:?\s*(\d{1,2}):(\d{2})[^0-9]*?(?:(\d{1,2})\.(\d{1,2})\.(\d{4})|(\d{1,2})\s+([A-Za-z]+)\s+(\d{4}))/i
+  );
+  if (!m) return null;
+  const hour = parseInt(m[1]);
+  const minute = parseInt(m[2]);
+  let day: number, month: number, year: number;
+  if (m[3]) {
+    day = parseInt(m[3]);
+    month = parseInt(m[4]) - 1;
+    year = parseInt(m[5]);
+  } else {
+    day = parseInt(m[6]);
+    const mo = MONTHS[m[7].toLowerCase()];
+    if (mo === undefined) return null;
+    month = mo;
+    year = parseInt(m[8]);
+  }
+  const stamp = new Date(year, month, day, hour, minute);
+  if (isNaN(stamp.getTime())) return null;
+  const age = (Date.now() - stamp.getTime()) / 60_000;
+  // Timezone slop between the source's clock and ours can make very recent
+  // stamps appear slightly in the future — that just means "fresh".
+  return age < 0 ? 0 : Math.round(age);
 }
 
 function parseWaitNearLabel(text: string): number | null {
@@ -351,13 +420,20 @@ export function parseGeneric(body: string, config: SourceConfig): ParsedWaitTime
     if (c.closed) continue;
     // Capture opening hours when the source publishes them alongside the wait
     // (Cornwall's blocks read "Open: Every day, 8am to 8pm. Walk in or…").
-    const openMatch = c.text
-      .replace(/\s+/g, " ")
-      .match(/Open:\s*([^.]{3,100}\.)/);
+    const flat = c.text.replace(/\s+/g, " ");
+    const openMatch = flat.match(/Open:\s*([^.]{3,100}\.)/);
+    // Patient counts, when published in the same block (Plymouth, PAH, Torbay
+    // all do) — previously dropped, leaving "—" on pages whose sources
+    // publish the numbers.
+    const waitingMatch = flat.match(/number of patients (?:currently )?waiting[^0-9]{0,40}?(\d+)/i);
+    const totalMatch = flat.match(/total number of patients[^0-9]{0,40}?(\d+)/i)
+      || flat.match(/patients currently in the [A-Za-z' ]*department:?\s*(\d+)/i);
     results.push({
       hospitalSlug: c.slug,
       hospitalName: c.name,
       waitMinutes: c.wait,
+      patientsWaiting: waitingMatch ? parseInt(waitingMatch[1]) : null,
+      totalPatients: totalMatch ? parseInt(totalMatch[1]) : null,
       type: c.type,
       openingHours: openMatch ? `Open: ${openMatch[1].trim()}` : null,
     });
@@ -402,8 +478,18 @@ export function parseWaitText(text: string): number | null {
   const moreMatch = text.match(/(?:over|more than)\s+(\d+)\s*(?:hours?|hrs?)/i);
   if (moreMatch) return parseInt(moreMatch[1]) * 60 + 30;
 
+  // Trailing "+" qualifier, e.g. Forth Valley's "12 hours +" — treat like
+  // "more than N hours" rather than reporting an exact-looking figure.
+  const plusMatch = text.match(/(\d+)\s*(?:hours?|hrs?)\s*\+/i);
+  if (plusMatch) return parseInt(plusMatch[1]) * 60 + 30;
+
   const lessMatch = text.match(/(?:less than|under)\s+(\d+)\s*(?:hours?|hrs?)/i);
   if (lessMatch) return Math.max(parseInt(lessMatch[1]) * 60 - 30, 15);
+
+  // "less than 30 minutes" (NCIC Penrith style) — don't report the ceiling
+  // as if it were the exact wait.
+  const lessMinsMatch = text.match(/(?:less than|under)\s+(\d+)\s*(?:minutes?|mins?)/i);
+  if (lessMinsMatch) return Math.max(parseInt(lessMinsMatch[1]) - 5, 5);
 
   const hoursOnly = text.match(/(\d+)\s*(?:hours?|hrs?|h)\b/i);
   if (hoursOnly) {

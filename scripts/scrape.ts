@@ -76,9 +76,9 @@ async function main() {
     `[${new Date().toISOString()}] Done — ${totalUpdated} hospitals updated, ${totalErrors} errors`
   );
 
-  // Checkpoint the WAL into the main DB file and close cleanly. Without this,
-  // this run's inserts live only in aewaittime.db-wal — and CI caches just
-  // aewaittime.db, silently losing every reading and breaking 24h history.
+  // Checkpoint the WAL into the main DB file and close cleanly. CI now caches
+  // the -wal/-shm sidecars too, so this is defense-in-depth — but keep it: a
+  // checkpointed single-file DB is what every downstream consumer expects.
   db.pragma("wal_checkpoint(TRUNCATE)");
   db.close();
 
@@ -86,4 +86,7 @@ async function main() {
   process.exit(allFailed ? 1 : 0);
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

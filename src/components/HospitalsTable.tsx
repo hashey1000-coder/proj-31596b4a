@@ -59,9 +59,10 @@ export function HospitalsTable({
           <input
             type="text"
             placeholder="Filter by name, city or region…"
+            aria-label="Filter hospitals by name, city or region"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#005EB8] focus:border-transparent"
+            className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#005EB8] focus:border-transparent"
           />
           {query && (
             <p className="mt-2 text-sm text-gray-500">
@@ -80,22 +81,22 @@ export function HospitalsTable({
 
       <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full">
+          <table className="w-full" aria-label="All NHS A&E departments, sorted by current wait">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Hospital
                 </th>
-                <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="hidden sm:table-cell px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Region
                 </th>
-                <th className="hidden sm:table-cell px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="hidden sm:table-cell px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Type
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Current Wait
                 </th>
-                <th className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Patients
                 </th>
               </tr>
@@ -134,13 +135,13 @@ export function HospitalsTable({
                           <span className="text-sm font-semibold text-gray-900">
                             {hospital.wait_minutes} min
                           </span>
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-500">
                             ({formatWaitTime(hospital.wait_minutes)})
                           </span>
                         </div>
                       ) : (
                         <div className="text-right">
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-500">
                             Live wait unavailable
                           </span>
                           <p className="text-xs text-gray-500 mt-0.5">

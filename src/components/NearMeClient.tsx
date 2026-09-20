@@ -62,12 +62,16 @@ export function NearMeClient({
       .slice(0, 15);
   }, [hospitals, userLat, userLng]);
 
+  // Reading ?lat/&lng from the URL must happen after mount: this is a static
+  // export (no useSearchParams), and doing it in a useState initializer would
+  // desync server and client HTML.
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const lat = params.get("lat");
     const lng = params.get("lng");
     const pc = params.get("postcode");
     if (lat && lng) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setLocationLabel(pc ? pc.toUpperCase() : "Your location");
       setUserLat(parseFloat(lat));
       setUserLng(parseFloat(lng));
@@ -216,13 +220,13 @@ export function NearMeClient({
             </svg>
             Use my location
           </button>
-          <p className="text-xs text-gray-400 mt-3 mb-6">
+          <p className="text-xs text-gray-500 mt-3 mb-6">
             We use your location once. Nothing is stored.
           </p>
 
           <div className="flex items-center gap-3 max-w-xs mx-auto mb-4">
             <div className="flex-1 h-px bg-gray-200" />
-            <span className="text-xs text-gray-400 font-medium">or</span>
+            <span className="text-xs text-gray-500 font-medium">or</span>
             <div className="flex-1 h-px bg-gray-200" />
           </div>
 
@@ -330,9 +334,9 @@ export function NearMeClient({
                             <span className="text-2xl font-bold text-gray-900">
                               {h.wait_minutes}
                             </span>
-                            <span className="text-sm text-gray-400">min</span>
+                            <span className="text-sm text-gray-500">min</span>
                           </div>
-                          <p className="text-xs text-gray-400">
+                          <p className="text-xs text-gray-500">
                             ~ {formatWait(h.wait_minutes!)}
                           </p>
                         </>
@@ -348,17 +352,17 @@ export function NearMeClient({
                             <span className="text-2xl font-bold text-gray-500">
                               ~{displayWait}
                             </span>
-                            <span className="text-sm text-gray-400">min</span>
+                            <span className="text-sm text-gray-500">min</span>
                           </div>
-                          <p className="text-xs text-gray-400">
-                            {h.pct_within_4h}% seen in 4h
+                          <p className="text-xs text-gray-500">
+                            {h.pct_within_4h}% out within 4h
                           </p>
-                          <p className="text-[10px] text-gray-300">
+                          <p className="text-[10px] text-gray-500">
                             NHS England data
                           </p>
                         </>
                       ) : (
-                        <span className="text-xs text-gray-400">
+                        <span className="text-xs text-gray-500">
                           No data available
                         </span>
                       )}
@@ -368,7 +372,7 @@ export function NearMeClient({
               );
             })}
           </div>
-          <p className="text-xs text-gray-400 mt-4">
+          <p className="text-xs text-gray-500 mt-4">
             <strong>Live</strong> = real-time from NHS trust feeds.{" "}
             <strong>Typical wait</strong> = estimated average from NHS England
             monthly statistics (not real-time).
