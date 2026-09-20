@@ -8,6 +8,14 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 
+# ── Tombstones for files removed from the build (scp never deletes) ─────────
+# Done with mod_rewrite [G] — LiteSpeed ignores mod_alias "Redirect gone" for
+# directories that still exist on disk. Sandwell General's A&E closed in
+# 2024; PAH SDEC publishes no live wait; ads.txt is from a reverted experiment.
+RewriteRule ^hospitals/sandwell-general-hospital(/|$) - [G,L]
+RewriteRule ^hospitals/princess-alexandra-hospital-sdec(/|$) - [G,L]
+RewriteRule ^ads\.txt$ - [G,L]
+
 <IfModule mod_headers.c>
   # HSTS — only meaningful on HTTPS responses
   Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains" env=HTTPS
@@ -27,9 +35,3 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
   </FilesMatch>
 </IfModule>
 
-# ── Tombstones for files removed from the build (scp never deletes) ─────────
-# Sandwell General's A&E closed in 2024; PAH SDEC publishes no live wait.
-Redirect gone /hospitals/sandwell-general-hospital/
-Redirect gone /hospitals/princess-alexandra-hospital-sdec/
-# Left over from a reverted ads experiment
-Redirect gone /ads.txt
