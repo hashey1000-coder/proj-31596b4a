@@ -18,6 +18,8 @@ export function SearchBar({
   const [query, setQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(false);
+  // Active option for keyboard navigation (-1 = none highlighted).
+  const [activeIndex, setActiveIndex] = useState(-1);
   const router = useRouter();
   const wrapperRef = useRef<HTMLDivElement>(null);
 
@@ -44,6 +46,15 @@ export function SearchBar({
         )
         .slice(0, 8)
     : [];
+
+  const listboxOpen = showResults && filtered.length > 0;
+
+  function selectHospital(h: HospitalWithWait) {
+    router.push(`/hospitals/${h.slug}`);
+    setShowResults(false);
+    setQuery("");
+    setActiveIndex(-1);
+  }
 
   async function handlePostcodeSearch() {
     if (!isPostcode) return;
@@ -80,6 +91,31 @@ export function SearchBar({
     }
   }
 
+  function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+    if (e.key === "Escape") {
+      setShowResults(false);
+      setActiveIndex(-1);
+      return;
+    }
+    if (e.key === "Enter") {
+      if (listboxOpen && activeIndex >= 0 && filtered[activeIndex]) {
+        e.preventDefault();
+        selectHospital(filtered[activeIndex]);
+      } else {
+        handleSubmit();
+      }
+      return;
+    }
+    if (!listboxOpen) return;
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => (i + 1) % filtered.length);
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => (i <= 0 ? filtered.length - 1 : i - 1));
+    }
+  }
+
   function handleUseLocation() {
     if (!navigator.geolocation) {
       alert("Geolocation is not supported by your browser.");
@@ -110,6 +146,7 @@ export function SearchBar({
             viewBox="0 0 24 24"
             stroke="currentColor"
             strokeWidth={2}
+            aria-hidden="true"
           >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
@@ -121,14 +158,19 @@ export function SearchBar({
             onChange={(e) => {
               setQuery(e.target.value);
               setShowResults(true);
+              setActiveIndex(-1);
             }}
             onFocus={() => setShowResults(true)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") handleSubmit();
-              if (e.key === "Escape") setShowResults(false);
-            }}
+            onKeyDown={handleKeyDown}
+            role="combobox"
             aria-label="Search hospital name or postcode"
-            className="w-full rounded-xl border border-gray-300 bg-white pl-10 pr-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#005EB8] focus:border-transparent shadow-sm"
+            aria-expanded={listboxOpen}
+            aria-controls="search-results-listbox"
+            aria-autocomplete="list"
+            aria-activedescendant={
+              listboxOpen && activeIndex >= 0 ? `search-option-${activeIndex}` : undefined
+            }
+            className="w-full rounded-xl border border-gray-300 bg-white pl-10 pr-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#005EB8] focus:border-transparent shadow-sm"
           />
         </div>
         <button
@@ -140,35 +182,51 @@ export function SearchBar({
         </button>
       </div>
 
+      {/* Screen-reader announcement of result count */}
+      <div aria-live="polite" role="status" className="sr-only">
+        {showResults && query.length >= 2 && !isPostcode
+          ? filtered.length > 0
+            ? `${filtered.length} hospital${filtered.length === 1 ? "" : "s"} found. Use the up and down arrow keys to review, Enter to open.`
+            : "No hospitals found."
+          : ""}
+      </div>
+
       <div className="mt-2 flex items-center gap-3">
         <button
           onClick={handleUseLocation}
           disabled={loading}
           className="inline-flex items-center gap-1.5 text-sm text-[#005EB8] hover:underline font-medium disabled:opacity-50"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} aria-hidden="true">
             <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />
             <circle cx="12" cy="9" r="2.5" />
           </svg>
           Use my location
         </button>
-        <span className="text-xs text-gray-400">
+        <span className="text-xs text-gray-500">
           We use your location once. Nothing is stored.
         </span>
       </div>
 
       {/* Dropdown results */}
-      {showResults && filtered.length > 0 && (
-        <div className="absolute top-[52px] left-0 right-0 rounded-xl border border-gray-200 bg-white shadow-lg z-50 overflow-hidden max-h-[360px] overflow-y-auto">
-          {filtered.map((h) => (
-            <button
+      {listboxOpen && (
+        <ul
+          id="search-results-listbox"
+          role="listbox"
+          aria-label="Hospital search results"
+          className="absolute top-[52px] left-0 right-0 rounded-xl border border-gray-200 bg-white shadow-lg z-50 overflow-hidden max-h-[360px] overflow-y-auto"
+        >
+          {filtered.map((h, i) => (
+            <li
               key={h.id}
-              onClick={() => {
-                router.push(`/hospitals/${h.slug}`);
-                setShowResults(false);
-                setQuery("");
-              }}
-              className="w-full px-4 py-3 text-left hover:bg-blue-50 flex items-center justify-between border-b border-gray-50 last:border-0 transition-colors"
+              id={`search-option-${i}`}
+              role="option"
+              aria-selected={i === activeIndex}
+              onMouseEnter={() => setActiveIndex(i)}
+              onClick={() => selectHospital(h)}
+              className={`w-full px-4 py-3 text-left flex items-center justify-between border-b border-gray-50 last:border-0 transition-colors cursor-pointer ${
+                i === activeIndex ? "bg-blue-50" : "hover:bg-blue-50"
+              }`}
             >
               <div>
                 <p className="text-sm font-medium text-gray-900">{h.name}</p>
@@ -193,9 +251,9 @@ export function SearchBar({
                   </span>
                 </div>
               )}
-            </button>
+            </li>
           ))}
-        </div>
+        </ul>
       )}
 
       {showResults && isPostcode && (
