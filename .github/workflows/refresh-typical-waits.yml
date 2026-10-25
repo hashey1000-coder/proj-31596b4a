@@ -1,0 +1,59 @@
+name: Refresh typical waits
+
+# Regenerates src/lib/typical-waits.ts from the official A&E statistics
+# (Public Health Scotland, StatsWales, NHS England). These publish monthly, so
+# this runs on the 16th — after all three nations' monthly releases — and only
+# commits when the data actually changes. The commit is picked up by the next
+# scheduled Scrape & Deploy run.
+on:
+  schedule:
+    - cron: "0 6 16 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Ensure data directory
+        run: mkdir -p data
+
+      # The generator reads the DB only for the England hospital -> trust
+      # mapping; the live wait data is irrelevant here.
+      - name: Restore database
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/aewaittime.db
+            data/aewaittime.db-wal
+            data/aewaittime.db-shm
+          key: db-${{ github.run_id }}
+          restore-keys: db-
+
+      - name: Regenerate typical waits
+        run: npx tsx scripts/generate-typical-waits.ts
+
+      - name: Commit if changed
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- src/lib/typical-waits.ts; then
+            echo "No change in typical waits."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add src/lib/typical-waits.ts
+          git commit -m "Refresh typical-wait data from official statistics"
+          git push origin HEAD:main

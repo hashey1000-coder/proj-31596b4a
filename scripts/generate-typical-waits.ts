@@ -215,9 +215,23 @@ export function getTypicalWait(slug: string): TypicalWait | null {
 }
 `;
 
+  // Safety guard: never overwrite good data with a degraded file when an
+  // upstream source has broken (e.g. a portal format change drops a nation to
+  // zero). England alone is ~90, so < 100 means at least one nation failed.
   const outPath = path.join(process.cwd(), "src", "lib", "typical-waits.ts");
+  const MIN_EXPECTED = 100;
+  if (slugs.length < MIN_EXPECTED) {
+    console.error(
+      `Refusing to write: only ${slugs.length} hospitals (< ${MIN_EXPECTED}) — a source likely failed. Keeping the existing file.`
+    );
+    process.exit(1);
+  }
+
   fs.writeFileSync(outPath, file);
   console.log(`Wrote ${slugs.length} hospitals to src/lib/typical-waits.ts`);
 }
 
-main();
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});
