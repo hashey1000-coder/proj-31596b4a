@@ -62,26 +62,19 @@ export async function scrapeSource(config: SourceConfig): Promise<{
     for (const p of parsed) {
       try {
         const hospitalId = ensureHospital(db, p, config, trustId);
-        // Plausibility guard: a single mis-rendered source page shouldn't
-        // pollute history. Reject a reading that jumps to more than 3x the
-        // previous one AND rises by over 4 hours within one scrape interval.
-        if (p.waitMinutes !== null) {
-          const prev = db
-            .prepare(
-              "SELECT wait_minutes FROM wait_readings WHERE hospital_id = ? AND wait_minutes IS NOT NULL ORDER BY scraped_at DESC LIMIT 1"
-            )
-            .get(hospitalId) as { wait_minutes: number } | undefined;
-          if (
-            prev &&
-            prev.wait_minutes > 0 &&
-            p.waitMinutes > prev.wait_minutes * 3 &&
-            p.waitMinutes - prev.wait_minutes > 240
-          ) {
-            errors.push(
-              `${p.hospitalName}: rejected implausible jump ${prev.wait_minutes} -> ${p.waitMinutes} min`
-            );
-            continue;
-          }
+        // Plausibility guard: an absolute ceiling, not a relative jump. No real
+        // "longest wait to be seen" exceeds ~15h — values above that are trust
+        // dashboard glitches (seen: Derriford 1422 min, Leighton 936 min). A
+        // relative "3x jump" guard was wrong here: it also rejected legitimate
+        // crisis-level steps (Midland Met's real 10h16m after a 2h36m reading),
+        // freezing a hospital at a stale value. 15h clears the worst genuine
+        // figures (Forth Valley's "12 hours +", 10h English majors waits).
+        const PLAUSIBLE_MAX_MINUTES = 15 * 60;
+        if (p.waitMinutes !== null && p.waitMinutes > PLAUSIBLE_MAX_MINUTES) {
+          errors.push(
+            `${p.hospitalName}: rejected implausible wait ${p.waitMinutes} min (> ${PLAUSIBLE_MAX_MINUTES})`
+          );
+          continue;
         }
         db.prepare(
           `INSERT INTO wait_readings (id, hospital_id, wait_minutes, patients_waiting, total_patients, source_timestamp, freshness)
