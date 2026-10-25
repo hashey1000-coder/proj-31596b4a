@@ -484,9 +484,13 @@ export function parseWaitText(text: string): number | null {
   const lessMinsMatch = text.match(/(?:less than|under)\s+(\d+)\s*(?:minutes?|mins?)/i);
   if (lessMinsMatch) return Math.max(parseInt(lessMinsMatch[1]) - 5, 5);
 
-  const hoursOnly = text.match(/(\d+)\s*(?:hours?|hrs?|h)\b/i);
-  if (hoursOnly) {
-    const hrs = parseInt(hoursOnly[1]);
+  // Scan every "N hours" occurrence and take the first plausible one (< 24h).
+  // A single .match() would stop at the first hit, so an "Open 24 hours"
+  // opening-hours phrase in the same block (Torbay publishes "24 hours, 7 days
+  // a week … to be seen 3hr") would shadow the real wait and the whole parse
+  // would fall through to null.
+  for (const m of text.matchAll(/(\d+)\s*(?:hours?|hrs?|h)\b/gi)) {
+    const hrs = parseInt(m[1]);
     if (hrs >= 0 && hrs < 24) return hrs * 60;
   }
 

@@ -92,8 +92,11 @@ export const SOURCES: SourceConfig[] = [
       { siteKey: "Estuary View", name: "Estuary View Whitstable", slug: "estuary-view-whitstable", type: "UTC" },
       { siteKey: "Faversham", name: "Faversham UTC", slug: "faversham-utc", type: "UTC" },
       { siteKey: "Herne Bay", name: "Herne Bay UTC", slug: "herne-bay-utc", type: "UTC" },
-      { siteKey: "Royal Victoria Hospital, Folkestone", name: "Royal Victoria Hospital Folkestone", slug: "royal-victoria-hospital-folkestone", type: "UTC" },
-      { siteKey: "Victoria Hospital, Deal", name: "Victoria Hospital Deal", slug: "victoria-hospital-deal", type: "UTC" },
+      // The Kent feed relabelled these "Folkestone UTC, Royal Victoria Hospital"
+      // and "Deal UTC, Victoria Hospital" (town first), so match on the unique
+      // town name rather than the old comma-ordered hospital name.
+      { siteKey: "Folkestone", name: "Royal Victoria Hospital Folkestone", slug: "royal-victoria-hospital-folkestone", type: "UTC" },
+      { siteKey: "Deal", name: "Victoria Hospital Deal", slug: "victoria-hospital-deal", type: "UTC" },
       { siteKey: "Kent and Canterbury", name: "Kent and Canterbury Hospital", slug: "kent-and-canterbury-hospital", type: "UTC" },
     ],
   },
