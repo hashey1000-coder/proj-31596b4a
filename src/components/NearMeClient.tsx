@@ -358,7 +358,7 @@ export function NearMeClient({
                             {h.pct_within_4h}% out within 4h
                           </p>
                           <p className="text-[10px] text-gray-500">
-                            NHS England data
+                            Official NHS statistics
                           </p>
                         </>
                       ) : (

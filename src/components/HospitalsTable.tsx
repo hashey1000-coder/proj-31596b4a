@@ -29,7 +29,16 @@ export function HospitalsTable({
       : hospitals;
 
     const s = [...f].sort((a, b) => {
-      if (a.wait_minutes === null && b.wait_minutes === null) return 0;
+      // Live waits first (shortest first), then no-live hospitals ordered by
+      // their official typical wait, then those with nothing at all.
+      if (a.wait_minutes === null && b.wait_minutes === null) {
+        const at = a.typical_wait_minutes;
+        const bt = b.typical_wait_minutes;
+        if (at === null && bt === null) return 0;
+        if (at === null) return 1;
+        if (bt === null) return -1;
+        return at - bt;
+      }
       if (a.wait_minutes === null) return 1;
       if (b.wait_minutes === null) return -1;
       return a.wait_minutes - b.wait_minutes;
@@ -139,28 +148,30 @@ export function HospitalsTable({
                             ({formatWaitTime(hospital.wait_minutes)})
                           </span>
                         </div>
+                      ) : hospital.typical_wait_minutes !== null ? (
+                        <div className="text-right">
+                          <div className="flex items-center justify-end gap-2">
+                            <span className="text-sm font-semibold text-gray-700">
+                              ~ {formatWaitTime(hospital.typical_wait_minutes)}
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-gray-500 mt-0.5">
+                            Typical · {hospital.typical_source}
+                          </p>
+                        </div>
                       ) : (
                         <div className="text-right">
                           <span className="text-xs text-gray-500">
-                            Live wait unavailable
+                            No data
                           </span>
-                          <p className="text-xs text-gray-500 mt-0.5">
-                            {hospital.avg_wait !== null ? (
-                              <>
-                                Avg:{" "}
-                                <span className="font-medium">
-                                  {hospital.avg_wait} min
-                                </span>
-                              </>
-                            ) : nationalAvg > 0 ? (
-                              <>
-                                National avg:{" "}
-                                <span className="font-medium">
-                                  {nationalAvg} min
-                                </span>
-                              </>
-                            ) : null}
-                          </p>
+                          {nationalAvg > 0 && (
+                            <p className="text-xs text-gray-500 mt-0.5">
+                              National avg:{" "}
+                              <span className="font-medium">
+                                {nationalAvg} min
+                              </span>
+                            </p>
+                          )}
                         </div>
                       )}
                     </td>

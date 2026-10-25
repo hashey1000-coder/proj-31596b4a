@@ -240,16 +240,35 @@ export default async function HospitalDetailPage({
                   </p>
                 )}
               </>
+            ) : hospital.typical_wait_minutes !== null ? (
+              <div>
+                <p className="text-sm text-gray-500">No live feed — typical wait</p>
+                <div className="mt-1">
+                  <p className="text-4xl font-bold text-gray-700">
+                    {hospital.typical_wait_minutes}
+                  </p>
+                  <p className="text-sm text-gray-500">
+                    minutes &middot; ~ {formatWaitTime(hospital.typical_wait_minutes)}
+                  </p>
+                  {hospital.typical_pct_within_4h !== null && (
+                    <p className="text-xs text-gray-500 mt-2">
+                      {hospital.typical_pct_within_4h}% seen within 4 hours
+                    </p>
+                  )}
+                  <p className="text-[11px] text-gray-400 mt-2 leading-snug">
+                    Estimate from {hospital.typical_source} official
+                    statistics ({hospital.typical_period}) — not live
+                  </p>
+                </div>
+              </div>
             ) : (
               <div>
                 <p className="text-lg text-gray-500">Live wait unavailable</p>
                 <div className="mt-2">
                   <p className="text-xs text-gray-500 uppercase tracking-wider">
-                    {hospital.avg_wait !== null ? "Average" : "National Average"}
+                    National Average
                   </p>
-                  <p className="text-3xl font-bold text-gray-500">
-                    {hospital.avg_wait ?? nationalAvg}
-                  </p>
+                  <p className="text-3xl font-bold text-gray-500">{nationalAvg}</p>
                   <p className="text-sm text-gray-500">minutes</p>
                 </div>
               </div>

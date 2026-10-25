@@ -1,4 +1,5 @@
 import { getDb } from "../db";
+import { getTypicalWait } from "../typical-waits";
 
 export interface Hospital {
   id: string;
@@ -31,6 +32,29 @@ export interface HospitalWithWait extends Hospital {
   source_timestamp: string | null;
   freshness: string;
   avg_wait: number | null;
+  // Official-statistics fallback (from src/lib/typical-waits.ts), shown only
+  // when there is no live wait_minutes.
+  typical_wait_minutes: number | null;
+  typical_pct_within_4h: number | null;
+  typical_period: string | null;
+  typical_source: string | null;
+}
+
+/** Attach the official-statistics typical wait (if any) by slug. */
+function withTypical<T extends { slug: string }>(h: T): T & {
+  typical_wait_minutes: number | null;
+  typical_pct_within_4h: number | null;
+  typical_period: string | null;
+  typical_source: string | null;
+} {
+  const t = getTypicalWait(h.slug);
+  return {
+    ...h,
+    typical_wait_minutes: t?.typicalWaitMinutes ?? null,
+    typical_pct_within_4h: t?.pctWithin4h ?? null,
+    typical_period: t?.period ?? null,
+    typical_source: t?.source ?? null,
+  };
 }
 
 export interface WaitReading {
@@ -46,7 +70,7 @@ export interface WaitReading {
 
 export function getAllHospitalsWithWaits(): HospitalWithWait[] {
   const db = getDb();
-  return db
+  const rowsAll = db
     .prepare(
       `SELECT h.*, t.name as trust_name, t.source_url as trust_source_url,
               r.wait_minutes, r.patients_waiting, r.total_patients, r.source_timestamp, r.freshness,
@@ -72,6 +96,7 @@ export function getAllHospitalsWithWaits(): HospitalWithWait[] {
        ORDER BY h.name`
     )
     .all() as HospitalWithWait[];
+  return rowsAll.map(withTypical);
 }
 
 export function getHospitalBySlug(slug: string): HospitalWithWait | null {
@@ -102,7 +127,7 @@ export function getHospitalBySlug(slug: string): HospitalWithWait | null {
        WHERE h.slug = ?`
     )
     .get(slug) as HospitalWithWait | undefined;
-  return row ?? null;
+  return row ? withTypical(row) : null;
 }
 
 export function getHospitalReadings(
@@ -122,7 +147,7 @@ export function getHospitalReadings(
 
 export function getHospitalsByRegion(region: string): HospitalWithWait[] {
   const db = getDb();
-  return db
+  const rowsRegion = db
     .prepare(
       `SELECT h.*, t.name as trust_name, t.source_url as trust_source_url,
               r.wait_minutes, r.patients_waiting, r.total_patients, r.source_timestamp, r.freshness,
@@ -149,6 +174,7 @@ export function getHospitalsByRegion(region: string): HospitalWithWait[] {
        ORDER BY r.wait_minutes ASC`
     )
     .all(region) as HospitalWithWait[];
+  return rowsRegion.map(withTypical);
 }
 
 export function getLongestWaits(limit: number = 3): HospitalWithWait[] {

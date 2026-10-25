@@ -123,5 +123,9 @@ for (const [code, total, over4h] of RAW_DATA) {
 }
 
 export function getTypicalWaitForTrust(trustName: string): { avgWaitMinutes: number; pctWithin4h: number; period: string } | null {
-  return NHS_ENGLAND_TYPICAL_WAITS[trustName] ?? null;
+  if (NHS_ENGLAND_TYPICAL_WAITS[trustName]) return NHS_ENGLAND_TYPICAL_WAITS[trustName];
+  // Tolerate a leading "The " difference between our trust names and the
+  // SitRep's (e.g. "Newcastle upon Tyne Hospitals…" vs "The Newcastle…").
+  const alt = trustName.startsWith("The ") ? trustName.slice(4) : "The " + trustName;
+  return NHS_ENGLAND_TYPICAL_WAITS[alt] ?? null;
 }

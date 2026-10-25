@@ -127,16 +127,24 @@ export default async function RegionPage({
                       ~ {formatWaitTime(hospital.wait_minutes)}
                     </p>
                   </div>
+                ) : hospital.typical_wait_minutes !== null ? (
+                  <div className="text-right">
+                    <span className="text-lg font-bold text-gray-700">
+                      ~ {formatWaitTime(hospital.typical_wait_minutes)}
+                    </span>
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      Typical · {hospital.typical_source}
+                    </p>
+                  </div>
                 ) : (
                   <div className="text-right">
-                    <span className="text-xs text-gray-500">Live wait unavailable</span>
-                    <p className="text-xs text-gray-500 mt-0.5">
-                      {hospital.avg_wait !== null ? (
-                        <>Avg: <span className="font-semibold">{hospital.avg_wait} min</span></>
-                      ) : nationalAvg > 0 ? (
-                        <>National avg: <span className="font-semibold">{nationalAvg} min</span></>
-                      ) : null}
-                    </p>
+                    <span className="text-xs text-gray-500">No data</span>
+                    {nationalAvg > 0 && (
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        National avg:{" "}
+                        <span className="font-semibold">{nationalAvg} min</span>
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
