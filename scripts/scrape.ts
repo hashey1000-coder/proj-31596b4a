@@ -72,6 +72,17 @@ async function main() {
     .run();
   console.log(`  Pruned ${pruned.changes} old readings`);
 
+  // Purge any implausible readings already stored (the scrape guard stops new
+  // ones, but the persisted DB may hold glitches captured before the guard —
+  // e.g. a 23h Derriford reading. Removing them here heals the live site and
+  // the 24h history tables immediately rather than waiting for them to age out
+  // of the 2-hour freshness window.
+  const badPruned = db
+    .prepare("DELETE FROM wait_readings WHERE wait_minutes > 900")
+    .run();
+  if (badPruned.changes > 0)
+    console.log(`  Purged ${badPruned.changes} implausible readings (> 900 min)`);
+
   console.log(
     `[${new Date().toISOString()}] Done — ${totalUpdated} hospitals updated, ${totalErrors} errors`
   );
