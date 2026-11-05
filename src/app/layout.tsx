@@ -1,9 +1,14 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Geist } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
 import "./globals.css";
+
+// Google Analytics 4 (measurement ID is public). Placed in the root layout so
+// it loads on every statically-exported page.
+const GA_ID = "G-EZL0VPTSYT";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -49,6 +54,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-GB" data-scroll-behavior="smooth" className={`${geistSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col font-sans bg-gray-50 text-gray-900">
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="ga-init" strategy="afterInteractive">
+          {`
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', '${GA_ID}');
+          `}
+        </Script>
         <Header builtAt={new Date().toISOString()} />
         <main className="flex-1">{children}</main>
         <Footer />
