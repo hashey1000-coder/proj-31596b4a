@@ -1,0 +1,95 @@
+name: Feed health
+
+# Daily check for NHS feeds that have stopped updating (an upstream outage —
+# the trust's dashboard, not our code). Opens a single GitHub issue when any
+# feed has been stale for 48h+ (so the repo owner gets an email), updates it as
+# the list changes, and closes it automatically once every feed recovers.
+on:
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - name: Ensure data directory
+        run: mkdir -p data
+
+      # Read the live database maintained by the Scrape & Deploy workflow.
+      - name: Restore database
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/aewaittime.db
+            data/aewaittime.db-wal
+            data/aewaittime.db-shm
+          key: db-${{ github.run_id }}
+          restore-keys: db-
+
+      - name: Check feed health and manage alert issue
+        run: |
+          set -euo pipefail
+
+          OUT="$(npx tsx scripts/check-feed-health.ts --json)"
+          echo "$OUT"
+          JSON="$(printf '%s\n' "$OUT" | sed -n 's/^FEED_HEALTH_JSON=//p')"
+          if [ -z "$JSON" ]; then
+            echo "No JSON summary produced (DB missing?) — skipping."
+            exit 0
+          fi
+
+          COUNT="$(printf '%s' "$JSON" | jq '.staleCount')"
+          EXPECTED="$(printf '%s' "$JSON" | jq '.expected')"
+
+          # Guard against a cache miss restoring an empty DB, which would flag
+          # nearly everything. A real simultaneous outage hits one trust (a
+          # handful of hospitals); losing most of them at once means no DB.
+          if [ "$COUNT" -gt 40 ]; then
+            echo "::warning::$COUNT/$EXPECTED feeds stale — likely a missing database, not a real outage. Skipping alert."
+            exit 0
+          fi
+
+          # Find any open alert issue by its hidden marker.
+          ISSUE="$(gh issue list --state open --limit 50 --json number,body \
+            --jq 'map(select(.body | contains("<!-- feed-health-marker -->"))) | .[0].number // empty')"
+
+          if [ "$COUNT" -gt 0 ]; then
+            BODY="$(printf '%s' "$JSON" | jq -r '
+              "These NHS feeds have had no fresh reading for over \(.staleHours)h — almost always an upstream outage (the trust'"'"'s own dashboard), not our code. Affected hospitals show \"unavailable\" until the feed recovers.\n\n" +
+              (.stale | map("- **\(.name)** (\(.type)) — " + (if .hoursStale == null then "no readings in the last 7 days" else "\(.hoursStale)h since last reading" end)) | join("\n")) +
+              "\n\n_Checked \(now | strftime("%Y-%m-%d %H:%M UTC")). Auto-managed by the feed-health workflow — closes itself when all feeds recover._\n<!-- feed-health-marker -->"
+            ')"
+            TITLE="⚠️ NHS feed health: ${COUNT} stale feed(s)"
+            if [ -n "$ISSUE" ]; then
+              gh issue edit "$ISSUE" --title "$TITLE" --body "$BODY"
+              echo "Updated issue #$ISSUE"
+            else
+              gh issue create --title "$TITLE" --body "$BODY"
+              echo "Opened a new feed-health issue"
+            fi
+          else
+            if [ -n "$ISSUE" ]; then
+              gh issue comment "$ISSUE" --body "✅ All feeds are healthy again — closing automatically."
+              gh issue close "$ISSUE"
+              echo "Closed issue #$ISSUE"
+            else
+              echo "All feeds healthy; no open issue."
+            fi
+          fi

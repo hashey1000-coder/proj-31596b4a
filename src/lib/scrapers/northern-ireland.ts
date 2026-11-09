@@ -136,6 +136,13 @@ export async function scrapeNorthernIreland(): Promise<{
     errors.push(err instanceof Error ? err.message : String(err));
   }
 
+  // nidirect intermittently serves the page with no data table (200 OK, no
+  // rows). Don't report that as a silent success — surface it so the scrape
+  // log and feed-health check register the outage.
+  if (hospitalsUpdated === 0 && errors.length === 0) {
+    errors.push("nidirect returned no emergency-department rows (empty page?)");
+  }
+
   return { success: errors.length === 0, hospitalsUpdated, errors };
 }
 
