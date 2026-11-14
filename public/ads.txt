@@ -1,4 +1,5 @@
 lkz.ai, 1325, DIRECT
+lkz.ai, 1324, DIRECT
 rebros.net, 10353, DIRECT
 google.com, pub-1595639729766067, RESELLER, f08c47fec0942fa0
 google.com, pub-5462413891359508, RESELLER, f08c47fec0942fa0
