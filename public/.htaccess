@@ -11,10 +11,9 @@ RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
 # ── Tombstones for files removed from the build (scp never deletes) ─────────
 # Done with mod_rewrite [G] — LiteSpeed ignores mod_alias "Redirect gone" for
 # directories that still exist on disk. Sandwell General's A&E closed in
-# 2024; PAH SDEC publishes no live wait; ads.txt is from a reverted experiment.
+# 2024; PAH SDEC publishes no live wait.
 RewriteRule ^hospitals/sandwell-general-hospital(/|$) - [G,L]
 RewriteRule ^hospitals/princess-alexandra-hospital-sdec(/|$) - [G,L]
-RewriteRule ^ads\.txt$ - [G,L]
 
 <IfModule mod_headers.c>
   # HSTS — only meaningful on HTTPS responses
