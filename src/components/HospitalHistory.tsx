@@ -1,17 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { formatWaitTime } from "@/lib/utils";
 import type { WaitReading } from "@/lib/data/hospitals";
 
-function relativeTime(dateStr: string): string {
-  const diff = Date.now() - new Date(dateStr).getTime();
+function relativeTime(dateStr: string, now: number): string {
+  const diff = now - new Date(dateStr).getTime();
   const mins = Math.floor(diff / 60000);
   if (mins < 1) return "just now";
   if (mins < 60) return `${mins} min ago`;
   const hrs = Math.floor(mins / 60);
   if (hrs < 24) return `${hrs}h ago`;
   return `${Math.floor(hrs / 24)}d ago`;
+}
+
+// Pin the timezone so the server build (UTC) and the visitor's browser format
+// the clock identically — otherwise the two disagree and hydration fails.
+function clockTime(dateStr: string): string {
+  return new Date(dateStr).toLocaleString("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+    timeZone: "Europe/London",
+  });
 }
 
 export function HospitalHistory({
@@ -23,6 +33,20 @@ export function HospitalHistory({
 }) {
   const [showAll, setShowAll] = useState(false);
   const visibleReadings = showAll ? readings : readings.slice(0, 12);
+
+  // "X min ago" depends on the current clock, which only exists on the client.
+  // Start null so the server HTML and the first client render match (both show
+  // the fixed clock time); fill in the relative label after mount and tick it
+  // once a minute.
+  const [now, setNow] = useState<number | null>(null);
+  useEffect(() => {
+    // Intentional one-shot sync after mount: the clock must only start on the
+    // client, otherwise the static HTML and first client render disagree.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setNow(Date.now());
+    const id = setInterval(() => setNow(Date.now()), 60_000);
+    return () => clearInterval(id);
+  }, []);
 
   return (
     <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
@@ -65,14 +89,17 @@ export function HospitalHistory({
 
               return (
                 <tr key={r.id}>
-                  <td className="py-2.5 text-gray-600">
-                    <span>{relativeTime(r.scraped_at)}</span>
-                    <span className="text-gray-400 text-xs ml-1.5">
-                      {new Date(r.scraped_at).toLocaleString("en-GB", {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                  <td className="py-2.5 text-gray-600" suppressHydrationWarning>
+                    <span>
+                      {now === null
+                        ? clockTime(r.scraped_at)
+                        : relativeTime(r.scraped_at, now)}
                     </span>
+                    {now !== null && (
+                      <span className="text-gray-400 text-xs ml-1.5">
+                        {clockTime(r.scraped_at)}
+                      </span>
+                    )}
                   </td>
                   <td className="py-2.5 pl-3 text-right font-medium text-gray-900 whitespace-nowrap">
                     {r.wait_minutes !== null
