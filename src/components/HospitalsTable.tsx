@@ -93,19 +93,19 @@ export function HospitalsTable({
           <table className="w-full" aria-label="All NHS A&E departments, sorted by current wait">
             <thead>
               <tr className="border-b border-gray-200 bg-gray-50">
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Hospital
                 </th>
-                <th scope="col" className="hidden sm:table-cell px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="hidden sm:table-cell px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Region
                 </th>
-                <th scope="col" className="hidden sm:table-cell px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="hidden sm:table-cell px-4 sm:px-6 py-3 text-left text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Type
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="px-4 sm:px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Current Wait
                 </th>
-                <th scope="col" className="px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
+                <th scope="col" className="hidden sm:table-cell px-4 sm:px-6 py-3 text-right text-xs font-semibold text-gray-600 uppercase tracking-wider">
                   Patients
                 </th>
               </tr>
@@ -118,7 +118,7 @@ export function HospitalsTable({
                     key={hospital.id}
                     className="hover:bg-gray-50 transition-colors"
                   >
-                    <td className="px-6 py-4">
+                    <td className="px-4 sm:px-6 py-4">
                       <Link
                         href={`/hospitals/${hospital.slug}`}
                         className="text-sm font-medium text-[#005EB8] hover:underline"
@@ -127,31 +127,31 @@ export function HospitalsTable({
                       </Link>
                       <p className="text-xs text-gray-500">{hospital.city}</p>
                     </td>
-                    <td className="hidden sm:table-cell px-6 py-4 text-sm text-gray-600">
+                    <td className="hidden sm:table-cell px-4 sm:px-6 py-4 text-sm text-gray-600">
                       {hospital.region}
                     </td>
-                    <td className="hidden sm:table-cell px-6 py-4">
+                    <td className="hidden sm:table-cell px-4 sm:px-6 py-4">
                       <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
                         {hospital.type}
                       </span>
                     </td>
-                    <td className="px-6 py-4 text-right">
+                    <td className="px-4 sm:px-6 py-4 text-right">
                       {hospital.wait_minutes !== null ? (
                         <div className="flex items-center justify-end gap-2">
                           <span
                             className={`w-2 h-2 rounded-full ${severityDotColor(severity)}`}
                           />
-                          <span className="text-sm font-semibold text-gray-900">
+                          <span className="text-sm font-semibold text-gray-900 whitespace-nowrap">
                             {hospital.wait_minutes} min
                           </span>
-                          <span className="text-xs text-gray-500">
+                          <span className="hidden sm:inline text-xs text-gray-500">
                             ({formatWaitTime(hospital.wait_minutes)})
                           </span>
                         </div>
                       ) : hospital.typical_wait_minutes !== null ? (
                         <div className="text-right">
                           <div className="flex items-center justify-end gap-2">
-                            <span className="text-sm font-semibold text-gray-700">
+                            <span className="text-sm font-semibold text-gray-700 whitespace-nowrap">
                               ~ {formatWaitTime(hospital.typical_wait_minutes)}
                             </span>
                           </div>
@@ -175,7 +175,7 @@ export function HospitalsTable({
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 text-right text-sm text-gray-600">
+                    <td className="hidden sm:table-cell px-4 sm:px-6 py-4 text-right text-sm text-gray-600">
                       {hospital.patients_waiting ?? hospital.total_patients ?? "—"}
                     </td>
                   </tr>

@@ -25,7 +25,7 @@ export function HospitalHistory({
   const visibleReadings = showAll ? readings : readings.slice(0, 12);
 
   return (
-    <div className="bg-white rounded-2xl border border-gray-200 p-6">
+    <div className="bg-white rounded-2xl border border-gray-200 p-4 sm:p-6">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">
         {hospitalName} A&E Wait Times — Last 24 Hours
       </h2>
@@ -36,16 +36,17 @@ export function HospitalHistory({
               <th scope="col" className="pb-2 text-left text-xs font-semibold text-gray-500 uppercase">
                 Time
               </th>
-              <th scope="col" className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
-                Typical Time in Dept
+              <th scope="col" className="pb-2 pl-3 text-right text-xs font-semibold text-gray-500 uppercase">
+                <span className="sm:hidden">Wait</span>
+                <span className="hidden sm:inline">Typical Time in Dept</span>
               </th>
-              <th scope="col" className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
+              <th scope="col" className="pb-2 pl-3 text-right text-xs font-semibold text-gray-500 uppercase">
                 Change
               </th>
-              <th scope="col" className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
+              <th scope="col" className="hidden sm:table-cell pb-2 pl-3 text-right text-xs font-semibold text-gray-500 uppercase">
                 Patients
               </th>
-              <th scope="col" className="pb-2 text-right text-xs font-semibold text-gray-500 uppercase">
+              <th scope="col" className="hidden sm:table-cell pb-2 pl-3 text-right text-xs font-semibold text-gray-500 uppercase">
                 Total in Dept
               </th>
             </tr>
@@ -73,12 +74,12 @@ export function HospitalHistory({
                       })}
                     </span>
                   </td>
-                  <td className="py-2.5 text-right font-medium text-gray-900">
+                  <td className="py-2.5 pl-3 text-right font-medium text-gray-900 whitespace-nowrap">
                     {r.wait_minutes !== null
                       ? formatWaitTime(r.wait_minutes)
                       : "—"}
                   </td>
-                  <td className="py-2.5 text-right">
+                  <td className="py-2.5 pl-3 text-right">
                     {change !== null ? (
                       <span
                         className={`text-xs font-medium ${
@@ -101,10 +102,10 @@ export function HospitalHistory({
                       <span className="text-xs text-gray-300">—</span>
                     )}
                   </td>
-                  <td className="py-2.5 text-right text-gray-600">
+                  <td className="hidden sm:table-cell py-2.5 pl-3 text-right text-gray-600">
                     {r.patients_waiting ?? "—"}
                   </td>
-                  <td className="py-2.5 text-right text-gray-600">
+                  <td className="hidden sm:table-cell py-2.5 pl-3 text-right text-gray-600">
                     {r.total_patients ?? "—"}
                   </td>
                 </tr>
