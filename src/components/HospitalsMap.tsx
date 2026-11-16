@@ -73,6 +73,20 @@ export function HospitalsMap({ hospitals }: { hospitals: MapHospital[] }) {
           scrollWheelZoom: false,
         });
 
+        // On touch devices a one-finger drag would pan the map and swallow the
+        // page scroll, trapping the reader on a full-height map. Disable the
+        // one-finger drag and let the browser scroll the page vertically
+        // (touch-action: pan-y); pinch-to-zoom and the +/- buttons still work.
+        const isTouch =
+          typeof window !== "undefined" &&
+          (window.matchMedia?.("(pointer: coarse)").matches ||
+            "ontouchstart" in window ||
+            navigator.maxTouchPoints > 0);
+        if (isTouch) {
+          map.dragging.disable();
+          containerRef.current.style.touchAction = "pan-y";
+        }
+
         L.tileLayer(
           "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
           {
@@ -92,11 +106,13 @@ export function HospitalsMap({ hospitals }: { hospitals: MapHospital[] }) {
               : `${live ? "" : "~ "}${mins} min${live ? " (live)" : " (typical)"}`;
 
           const marker = L.circleMarker([h.lat, h.lng], {
-            radius: 7,
+            radius: isTouch ? 9 : 7,
             color: "#ffffff",
             weight: 1.5,
             fillColor: b.color,
             fillOpacity: 0.9,
+            // Widen the invisible hit area so pins are easier to tap.
+            bubblingMouseEvents: false,
           }).addTo(map);
 
           const esc = (s: string) =>
@@ -128,7 +144,7 @@ export function HospitalsMap({ hospitals }: { hospitals: MapHospital[] }) {
       <div className="relative rounded-2xl overflow-hidden border border-gray-200">
         <div
           ref={containerRef}
-          className="h-[70vh] min-h-[420px] w-full bg-gray-100 z-0"
+          className="h-[58vh] min-h-[360px] sm:h-[70vh] w-full bg-gray-100 z-0"
         />
         {status === "loading" && (
           <div className="absolute inset-0 flex items-center justify-center bg-gray-50/80 pointer-events-none">
@@ -147,6 +163,12 @@ export function HospitalsMap({ hospitals }: { hospitals: MapHospital[] }) {
           </div>
         )}
       </div>
+
+      {/* Touch hint */}
+      <p className="mt-3 text-xs text-gray-500 sm:hidden">
+        Tap a pin for details. Pinch to zoom, or use the + / − buttons — a
+        one-finger swipe scrolls the page.
+      </p>
 
       {/* Legend */}
       <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-gray-600">
