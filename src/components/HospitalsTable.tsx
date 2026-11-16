@@ -64,6 +64,27 @@ export function HospitalsTable({
           wait time first.
         </p>
 
+        <div className="mt-3 flex flex-wrap gap-2">
+          <Link
+            href="/map"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-[#005EB8] hover:text-[#005EB8] transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path d="M9 6.75 3.75 4.5v12.75L9 19.5m0-12.75 6 2.25m-6-2.25v12.75m6-10.5 5.25-2.25V16.5L15 18.75m0-12v12" />
+            </svg>
+            View on map
+          </Link>
+          <Link
+            href="/compare"
+            className="inline-flex items-center gap-1.5 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-sm font-medium text-gray-700 hover:border-[#005EB8] hover:text-[#005EB8] transition-colors"
+          >
+            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path d="M9 7h6m-6 5h6m-6 5h6M4.5 7h.008v.008H4.5V7Zm0 5h.008v.008H4.5V12Zm0 5h.008v.008H4.5V17Z" />
+            </svg>
+            Compare hospitals
+          </Link>
+        </div>
+
         <div className="mt-4 max-w-md">
           <input
             type="text"

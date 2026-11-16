@@ -553,8 +553,17 @@ export default async function HospitalDetailPage({
                 })}
               </div>
               <Link
+                href={`/compare/?h=${[hospital.slug, ...nearby.slice(0, 3).map((h) => h.slug)].join(",")}`}
+                className="mt-4 w-full flex items-center justify-center gap-1.5 rounded-xl bg-[#005EB8] text-white px-4 py-2.5 text-sm font-semibold hover:bg-[#00529E] transition-colors"
+              >
+                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path d="M9 7h6m-6 5h6m-6 5h6M4.5 7h.008v.008H4.5V7Zm0 5h.008v.008H4.5V12Zm0 5h.008v.008H4.5V17Z" />
+                </svg>
+                Compare these side by side
+              </Link>
+              <Link
                 href="/near-me"
-                className="mt-4 flex items-center gap-1.5 text-sm font-medium text-[#005EB8] hover:underline"
+                className="mt-3 flex items-center gap-1.5 text-sm font-medium text-[#005EB8] hover:underline"
               >
                 <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
                   <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" />

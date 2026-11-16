@@ -87,6 +87,16 @@ export function Footer() {
             </h2>
             <ul className="space-y-2.5 text-sm text-white/75">
               <li>
+                <Link href="/map" className="hover:text-white transition-colors">
+                  A&E wait map
+                </Link>
+              </li>
+              <li>
+                <Link href="/compare" className="hover:text-white transition-colors">
+                  Compare hospitals
+                </Link>
+              </li>
+              <li>
                 <Link href="/guides" className="hover:text-white transition-colors">
                   Patient Guides
                 </Link>

@@ -14,6 +14,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     { url: `${baseUrl}/`, lastModified: now, changeFrequency: "hourly", priority: 1.0 },
     { url: `${baseUrl}/hospitals/`, lastModified: now, changeFrequency: "hourly", priority: 0.9 },
+    { url: `${baseUrl}/map/`, lastModified: now, changeFrequency: "hourly", priority: 0.8 },
+    { url: `${baseUrl}/compare/`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
     { url: `${baseUrl}/regions/`, lastModified: now, changeFrequency: "daily", priority: 0.8 },
     { url: `${baseUrl}/near-me/`, lastModified: now, changeFrequency: "weekly", priority: 0.8 },
     { url: `${baseUrl}/statistics/`, lastModified: now, changeFrequency: "daily", priority: 0.7 },
