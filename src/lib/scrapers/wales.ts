@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { getDb } from "../db";
 import { generateId, slugify } from "../utils";
+import { recordReading } from "./record-reading";
 
 const SOURCE_URL = "https://aeinfo.nhs.wales/";
 const TRUST_NAME = "NHS Wales (via aeinfo.nhs.wales)";
@@ -61,8 +62,16 @@ export async function scrapeWales(): Promise<{
     for (const h of hospitals) {
       try {
         const hospitalId = ensureHospital(db, h, trustId);
-        insertReading(db, hospitalId, h);
-        hospitalsUpdated++;
+        const rec = recordReading({
+          hospitalId,
+          waitMinutes: h.waitMinutes,
+          patientsWaiting: h.patientsWaiting,
+        });
+        if (rec.inserted) {
+          hospitalsUpdated++;
+        } else {
+          errors.push(`${h.name}: rejected ${rec.reason}`);
+        }
       } catch (err) {
         errors.push(
           `Failed to process ${h.name}: ${err instanceof Error ? err.message : String(err)}`
@@ -235,17 +244,6 @@ function ensureHospital(
   );
 
   return id;
-}
-
-function insertReading(
-  db: ReturnType<typeof getDb>,
-  hospitalId: string,
-  h: ScrapedHospital
-) {
-  db.prepare(
-    `INSERT INTO wait_readings (id, hospital_id, wait_minutes, patients_waiting, source_timestamp, freshness)
-     VALUES (?, ?, ?, ?, datetime('now'), 'live')`
-  ).run(generateId(), hospitalId, h.waitMinutes, h.patientsWaiting);
 }
 
 const WALES_COORDS: Record<string, { lat?: number; lng?: number; city?: string }> = {

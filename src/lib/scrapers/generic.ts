@@ -1,6 +1,7 @@
 import * as cheerio from "cheerio";
 import { getDb } from "../db";
 import { generateId, slugify } from "../utils";
+import { recordReading } from "./record-reading";
 import type { SourceConfig, ParsedWaitTime } from "./sources";
 
 const USER_AGENT =
@@ -62,24 +63,18 @@ export async function scrapeSource(config: SourceConfig): Promise<{
     for (const p of parsed) {
       try {
         const hospitalId = ensureHospital(db, p, config, trustId);
-        // Plausibility guard: an absolute ceiling, not a relative jump. No real
-        // "longest wait to be seen" exceeds ~15h — values above that are trust
-        // dashboard glitches (seen: Derriford 1422 min, Leighton 936 min). A
-        // relative "3x jump" guard was wrong here: it also rejected legitimate
-        // crisis-level steps (Midland Met's real 10h16m after a 2h36m reading),
-        // freezing a hospital at a stale value. 15h clears the worst genuine
-        // figures (Forth Valley's "12 hours +", 10h English majors waits).
-        const PLAUSIBLE_MAX_MINUTES = 15 * 60;
-        if (p.waitMinutes !== null && p.waitMinutes > PLAUSIBLE_MAX_MINUTES) {
-          errors.push(
-            `${p.hospitalName}: rejected implausible wait ${p.waitMinutes} min (> ${PLAUSIBLE_MAX_MINUTES})`
-          );
+        // Validation (the absolute plausibility ceiling, count sanitising) is
+        // centralised in recordReading so every scraper applies it identically.
+        const rec = recordReading({
+          hospitalId,
+          waitMinutes: p.waitMinutes,
+          patientsWaiting: p.patientsWaiting ?? null,
+          totalPatients: p.totalPatients ?? null,
+        });
+        if (!rec.inserted) {
+          errors.push(`${p.hospitalName}: rejected ${rec.reason}`);
           continue;
         }
-        db.prepare(
-          `INSERT INTO wait_readings (id, hospital_id, wait_minutes, patients_waiting, total_patients, source_timestamp, freshness)
-           VALUES (?, ?, ?, ?, ?, datetime('now'), 'live')`
-        ).run(generateId(), hospitalId, p.waitMinutes, p.patientsWaiting ?? null, p.totalPatients ?? null);
         // Keep opening hours in sync when the source publishes them
         if (p.openingHours) {
           db.prepare(
