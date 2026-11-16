@@ -38,6 +38,14 @@ function splitCsvLine(line: string): string[] {
 
 const norm = (s: string) => s.toUpperCase().replace(/\s+/g, " ").trim();
 
+// Our DB trust name -> the name NHS England's CSV uses, where they differ.
+const NAME_ALIASES: Record<string, string> = {
+  // CSV lists University Hospitals Bristol & Weston (runs Bristol Royal
+  // Infirmary) under its legacy short name.
+  "University Hospitals Bristol and Weston NHS Foundation Trust":
+    "Bristol NHS Foundation Trust",
+};
+
 async function main() {
   const url = process.argv[2] || DEFAULT_URL;
   const periodMatch = url.match(/([A-Za-z]+)-(20\d\d)-CSV/);
@@ -74,7 +82,11 @@ async function main() {
   const out: Record<string, { avgWaitMinutes: number; pctWithin4h: number; period: string }> = {};
   for (const { name } of trusts) {
     const alt = name.startsWith("The ") ? name.slice(4) : "The " + name;
-    const hit = csvMap.get(norm(name)) || csvMap.get(norm(alt));
+    const alias = NAME_ALIASES[name];
+    const hit =
+      csvMap.get(norm(name)) ||
+      csvMap.get(norm(alt)) ||
+      (alias ? csvMap.get(norm(alias)) : undefined);
     if (hit) out[name] = { ...hit, period };
   }
 

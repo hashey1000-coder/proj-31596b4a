@@ -20,6 +20,7 @@ export const TYPICAL_WAITS: Record<string, TypicalWait> = {
   "aintree-university-hospital": {"typicalWaitMinutes":229,"pctWithin4h":48.6,"period":"October 2026","source":"NHS England"},
   "alexandra-hospital-redditch": {"typicalWaitMinutes":222,"pctWithin4h":51.1,"period":"October 2026","source":"NHS England"},
   "borders-general-hospital": {"typicalWaitMinutes":177,"pctWithin4h":67.9,"period":"September 2026","source":"Public Health Scotland"},
+  "bristol-royal-infirmary": {"typicalWaitMinutes":179,"pctWithin4h":67.2,"period":"October 2026","source":"NHS England"},
   "burnley-general-hospital": {"typicalWaitMinutes":183,"pctWithin4h":65.7,"period":"October 2026","source":"NHS England"},
   "charing-cross-hospital": {"typicalWaitMinutes":212,"pctWithin4h":54.6,"period":"October 2026","source":"NHS England"},
   "chelsea-and-westminster-hospital": {"typicalWaitMinutes":170,"pctWithin4h":70.5,"period":"October 2026","source":"NHS England"},

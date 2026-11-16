@@ -46,6 +46,7 @@ export const NHS_ENGLAND_TYPICAL_WAITS: Record<string, { avgWaitMinutes: number;
   "University College London Hospitals NHS Foundation Trust": { avgWaitMinutes: 167, pctWithin4h: 71.5, period: "October 2026" },
   "University Hospital Southampton NHS Foundation Trust": { avgWaitMinutes: 186, pctWithin4h: 64.4, period: "October 2026" },
   "University Hospitals Birmingham NHS Foundation Trust": { avgWaitMinutes: 209, pctWithin4h: 55.8, period: "October 2026" },
+  "University Hospitals Bristol and Weston NHS Foundation Trust": { avgWaitMinutes: 179, pctWithin4h: 67.2, period: "October 2026" },
   "University Hospitals Coventry and Warwickshire NHS Trust": { avgWaitMinutes: 191, pctWithin4h: 62.7, period: "October 2026" },
   "University Hospitals Plymouth NHS Trust": { avgWaitMinutes: 260, pctWithin4h: 36.9, period: "October 2026" },
   "University Hospitals Sussex NHS Foundation Trust": { avgWaitMinutes: 210, pctWithin4h: 55.5, period: "October 2026" },
