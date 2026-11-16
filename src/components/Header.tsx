@@ -44,7 +44,7 @@ export function Header({ builtAt }: { builtAt?: string }) {
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
       {/* Country bar */}
-      <div className="hidden md:block border-b border-gray-100 bg-gray-50">
+      <div className="hidden lg:block border-b border-gray-100 bg-gray-50">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-8">
             <div className="flex items-center gap-1 text-xs text-gray-500">
@@ -92,7 +92,7 @@ export function Header({ builtAt }: { builtAt?: string }) {
             <span className="text-lg font-medium text-gray-400">UK</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden lg:flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
               <Link
                 key={item.href}
@@ -109,7 +109,7 @@ export function Header({ builtAt }: { builtAt?: string }) {
               href="https://www.nhs.uk"
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#007F3B] text-white hover:bg-[#006B32] transition-colors"
+              className="hidden lg:inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold bg-[#007F3B] text-white hover:bg-[#006B32] transition-colors"
             >
               NHS.uk
               <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -120,7 +120,7 @@ export function Header({ builtAt }: { builtAt?: string }) {
             {/* Mobile menu button */}
             <button
               onClick={() => setMenuOpen(!menuOpen)}
-              className="md:hidden p-2 rounded-lg hover:bg-gray-100"
+              className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
               aria-label={menuOpen ? "Close menu" : "Open menu"}
               aria-expanded={menuOpen}
               aria-controls="mobile-menu"
@@ -142,7 +142,7 @@ export function Header({ builtAt }: { builtAt?: string }) {
 
       {/* Mobile menu */}
       {menuOpen && (
-        <div id="mobile-menu" className="md:hidden border-t border-gray-200 bg-white">
+        <div id="mobile-menu" className="lg:hidden border-t border-gray-200 bg-white">
           <div className="px-4 py-4 space-y-1">
             {NAV_ITEMS.map((item) => (
               <Link
