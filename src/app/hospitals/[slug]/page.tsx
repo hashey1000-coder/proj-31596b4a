@@ -15,6 +15,7 @@ import {
 } from "@/lib/utils";
 import { getHospitalImage, optimizedImageUrl } from "@/lib/hospital-images";
 import { HospitalHistory } from "@/components/HospitalHistory";
+import { WaitTrendChart } from "@/components/WaitTrendChart";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -61,6 +62,8 @@ export default async function HospitalDetailPage({
   if (!hospital) notFound();
 
   const readings = getHospitalReadings(hospital.id, 24);
+  // A wider window for the trend chart than the 24-hour detail table.
+  const trendReadings = getHospitalReadings(hospital.id, 168);
   const severity = waitSeverity(hospital.wait_minutes);
 
   const allHospitals = getAllHospitalsWithWaits();
@@ -404,6 +407,9 @@ export default async function HospitalDetailPage({
               </div>
             </div>
           )}
+
+          {/* Wait-time trend */}
+          <WaitTrendChart readings={trendReadings} hospitalName={hospital.name} />
 
           {/* 24-Hour History */}
           {readings.length > 0 && (
