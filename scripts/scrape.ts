@@ -1,4 +1,6 @@
 import { runAllScrapers } from "../src/lib/scrapers";
+import { SOURCES } from "../src/lib/scrapers/sources";
+import { PLAUSIBLE_MAX_MINUTES } from "../src/lib/scrapers/record-reading";
 import { getDb } from "../src/lib/db";
 import fs from "fs";
 import path from "path";
@@ -66,6 +68,28 @@ async function main() {
     totalErrors += r.errors.length;
   }
 
+  // Parser change-detection: each configured source maps a known number of
+  // hospitals. If a scrape returns far fewer than that, the trust has probably
+  // restructured its page — a silent partial break that the staleness alert
+  // (48h) would miss for days. Surface it now as a CI warning. (Wales and NI
+  // discover their hospitals dynamically, so they are not checked here.)
+  const expectedBySource = new Map(SOURCES.map((s) => [s.name, s.hospitals.length]));
+  const degraded: string[] = [];
+  for (const r of results) {
+    const expected = expectedBySource.get(r.source);
+    if (expected && expected >= 2 && r.hospitalsUpdated < Math.ceil(expected / 2)) {
+      degraded.push(
+        `${r.source}: only ${r.hospitalsUpdated}/${expected} hospitals returned`
+      );
+    }
+  }
+  if (degraded.length > 0) {
+    console.warn(
+      "Possible parser degradation — source returned far fewer hospitals than it maps:"
+    );
+    for (const d of degraded) console.warn(`::warning::${d}`);
+  }
+
   // Prune readings older than 7 days to keep DB size manageable
   const pruned = db
     .prepare("DELETE FROM wait_readings WHERE scraped_at < datetime('now', '-7 days')")
@@ -78,10 +102,12 @@ async function main() {
   // the 24h history tables immediately rather than waiting for them to age out
   // of the 2-hour freshness window.
   const badPruned = db
-    .prepare("DELETE FROM wait_readings WHERE wait_minutes > 900")
-    .run();
+    .prepare("DELETE FROM wait_readings WHERE wait_minutes > ?")
+    .run(PLAUSIBLE_MAX_MINUTES);
   if (badPruned.changes > 0)
-    console.log(`  Purged ${badPruned.changes} implausible readings (> 900 min)`);
+    console.log(
+      `  Purged ${badPruned.changes} implausible readings (> ${PLAUSIBLE_MAX_MINUTES} min)`
+    );
 
   console.log(
     `[${new Date().toISOString()}] Done — ${totalUpdated} hospitals updated, ${totalErrors} errors`
