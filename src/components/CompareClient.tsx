@@ -42,11 +42,14 @@ export function CompareClient({ hospitals }: { hospitals: CompareHospital[] }) {
     const params = new URLSearchParams(window.location.search);
     const raw = params.get("h");
     if (!raw) return;
-    const slugs = raw
-      .split(",")
-      .map((s) => s.trim())
-      .filter((s) => bySlug.has(s))
-      .slice(0, MAX);
+    const slugs = Array.from(
+      new Set(
+        raw
+          .split(",")
+          .map((s) => s.trim())
+          .filter((s) => bySlug.has(s))
+      )
+    ).slice(0, MAX);
     // One-shot restore of a shared selection on mount; the static HTML renders
     // the empty state, so this only ever runs client-side after hydration.
     // eslint-disable-next-line react-hooks/set-state-in-effect
