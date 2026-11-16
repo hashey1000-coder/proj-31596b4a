@@ -89,6 +89,9 @@ jobs:
             -p "$SSH_PORT" \
             "$CPANEL_USER@$CPANEL_HOST" true
 
+      - name: Install lftp
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
+
       - name: Deploy to cPanel
         env:
           CPANEL_HOST: ${{ secrets.CPANEL_HOST }}
@@ -100,7 +103,21 @@ jobs:
           SSH_PORT="${CPANEL_SSH_PORT:-2239}"
           TARGET="${CPANEL_TARGET_DIR}"
 
-          SSH_OPTS="-i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15"
-
-          shopt -s dotglob
-          scp $SSH_OPTS -P "$SSH_PORT" -r out/* "$CPANEL_USER@$CPANEL_HOST:$TARGET/"
+          # The site is ~1,250 tiny files; scp uploaded them one at a time, so
+          # ~1,250 sequential SFTP round-trips dominated the deploy. lftp mirror
+          # reuses one connection and transfers 10 files in parallel, cutting the
+          # upload from minutes to seconds. No --delete, so (like scp) it only
+          # adds/overwrites and never removes — retired pages stay tombstoned via
+          # .htaccess. fail-exit makes a partial upload fail the job loudly
+          # instead of half-deploying to the live site.
+          lftp -c "
+            set cmd:fail-exit yes;
+            set net:max-retries 2;
+            set net:timeout 20;
+            set mirror:parallel-transfer-count 10;
+            set sftp:auto-confirm yes;
+            set sftp:connect-program 'ssh -a -x -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -p $SSH_PORT';
+            open -u '$CPANEL_USER,' 'sftp://$CPANEL_HOST';
+            mirror -R out/ '$TARGET/';
+            bye
+          "
