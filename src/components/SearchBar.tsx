@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import type { HospitalWithWait } from "@/lib/data/hospitals";
 
 interface PostcodeResult {
   postcode: string;
@@ -10,11 +9,21 @@ interface PostcodeResult {
   longitude: number;
 }
 
-export function SearchBar({
-  hospitals,
-}: {
-  hospitals: HospitalWithWait[];
-}) {
+// Mirrors public/search-index.json (scripts/generate-search-index.ts).
+interface SearchEntry {
+  id: string;
+  name: string;
+  slug: string;
+  city: string | null;
+  region: string | null;
+  postcode: string | null;
+  wait_minutes: number | null;
+}
+
+export function SearchBar() {
+  // The hospital list is loaded on demand from a small static JSON rather than
+  // embedded in every page's payload (see generate-search-index.ts).
+  const [hospitals, setHospitals] = useState<SearchEntry[]>([]);
   const [query, setQuery] = useState("");
   const [showResults, setShowResults] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -33,6 +42,22 @@ export function SearchBar({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Load the search index once (cached by the browser thereafter).
+  useEffect(() => {
+    let active = true;
+    fetch("/search-index.json")
+      .then((r) => (r.ok ? r.json() : []))
+      .then((data: SearchEntry[]) => {
+        if (active) setHospitals(data);
+      })
+      .catch(() => {
+        /* search simply has no suggestions if the index can't load */
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
   const isPostcode = /^[A-Z]{1,2}\d[A-Z\d]?\s*\d[A-Z]{2}$/i.test(query.trim());
 
   const normalize = (s: string) => s.toLowerCase().replace(/['']/g, "");
@@ -49,7 +74,7 @@ export function SearchBar({
 
   const listboxOpen = showResults && filtered.length > 0;
 
-  function selectHospital(h: HospitalWithWait) {
+  function selectHospital(h: SearchEntry) {
     router.push(`/hospitals/${h.slug}`);
     setShowResults(false);
     setQuery("");

@@ -1,6 +1,5 @@
 import Link from "next/link";
 import type { Metadata } from "next";
-import { getAllHospitalsWithWaits } from "@/lib/data/hospitals";
 import { SearchBar } from "@/components/SearchBar";
 
 export const metadata: Metadata = {
@@ -17,8 +16,6 @@ const QUICK_LINKS = [
 ];
 
 export default function NotFound() {
-  const hospitals = getAllHospitalsWithWaits();
-
   return (
     <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-20 md:py-28 text-center">
       <p className="text-sm font-bold text-[#005EB8] uppercase tracking-widest mb-3">
@@ -33,7 +30,7 @@ export default function NotFound() {
       </p>
 
       <div className="mt-8 max-w-xl mx-auto text-left">
-        <SearchBar hospitals={hospitals} />
+        <SearchBar />
       </div>
 
       <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
