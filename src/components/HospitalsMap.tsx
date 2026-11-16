@@ -111,7 +111,8 @@ export function HospitalsMap({ hospitals }: { hospitals: MapHospital[] }) {
             weight: 1.5,
             fillColor: b.color,
             fillOpacity: 0.9,
-            // Widen the invisible hit area so pins are easier to tap.
+            // Keep a pin tap on the pin — don't let it bubble to the map and
+            // immediately re-close the popup it just opened.
             bubblingMouseEvents: false,
           }).addTo(map);
 
