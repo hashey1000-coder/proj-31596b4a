@@ -23,7 +23,17 @@ jobs:
           node-version: 22
           cache: npm
 
-      - run: npm ci
+      - run: npm ci --prefer-offline --no-audit --no-fund
+
+      # Reuse Next's compiler/webpack cache across runs so the build does less
+      # work each time (the pages still re-render with fresh wait data).
+      - name: Cache Next build
+        uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-${{ hashFiles('package-lock.json') }}-${{ hashFiles('src/**', 'next.config.*', 'tailwind.config.*', 'tsconfig.json') }}
+          restore-keys: |
+            next-${{ hashFiles('package-lock.json') }}-
 
       - name: Ensure data directory
         run: mkdir -p data
@@ -90,7 +100,20 @@ jobs:
           SSH_PORT="${CPANEL_SSH_PORT:-2239}"
           TARGET="${CPANEL_TARGET_DIR}"
 
-          SSH_OPTS="-i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15"
+          SSH="ssh -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o ConnectTimeout=15 -p $SSH_PORT"
 
-          shopt -s dotglob
-          scp $SSH_OPTS -P "$SSH_PORT" -r out/* "$CPANEL_USER@$CPANEL_HOST:$TARGET/"
+          # rsync only sends the bytes that changed since last deploy, instead of
+          # re-uploading the whole 170MB out/ every run like scp did. No --delete,
+          # so files removed from the build stay on the server (tombstoned via
+          # .htaccess), matching the previous additive behaviour. Falls back to
+          # scp if the host has no rsync.
+          if rsync --version >/dev/null 2>&1 && $SSH "$CPANEL_USER@$CPANEL_HOST" "command -v rsync" >/dev/null 2>&1; then
+            rsync -rlz --no-perms --omit-dir-times --timeout=120 \
+              -e "$SSH" \
+              out/ "$CPANEL_USER@$CPANEL_HOST:$TARGET/"
+          else
+            echo "rsync unavailable on one side — falling back to scp"
+            shopt -s dotglob
+            scp -i "$HOME/.ssh/id_ed25519" -o IdentitiesOnly=yes -o BatchMode=yes \
+              -P "$SSH_PORT" -r out/* "$CPANEL_USER@$CPANEL_HOST:$TARGET/"
+          fi
