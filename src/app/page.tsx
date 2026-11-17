@@ -55,7 +55,8 @@ export default function HomePage() {
           <div className="flex flex-col md:flex-row md:items-center gap-8 md:gap-16">
             <div className="flex-1">
               <h1 className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight leading-tight">
-                Compare A&E Waits{" "}
+                Compare A&E Waits
+                <br />
                 <span className="text-[#005EB8]">Before You Travel</span>
               </h1>
               <p className="mt-4 text-lg text-gray-600 max-w-2xl leading-relaxed">
