@@ -2,7 +2,7 @@ name: Scrape & Deploy
 
 on:
   schedule:
-    - cron: "*/15 * * * *"
+    - cron: "*"*/30 * * * *"
   push:
     branches: [main]
   workflow_dispatch:
@@ -74,7 +74,8 @@ jobs:
           SSH_PORT="${CPANEL_SSH_PORT:-2239}"
 
           mkdir -p ~/.ssh
-          printf '%s\n' "$CPANEL_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
+          printf '%s
+' "$CPANEL_SSH_KEY" | tr -d '' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
           ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null
