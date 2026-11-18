@@ -78,16 +78,10 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
 
           ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-
-          ssh \
-            -i ~/.ssh/id_ed25519 \
-            -o IdentitiesOnly=yes \
-            -o PreferredAuthentications=publickey \
-            -o PubkeyAuthentication=yes \
-            -o BatchMode=yes \
-            -o ConnectTimeout=15 \
-            -p "$SSH_PORT" \
-            "$CPANEL_USER@$CPANEL_HOST" true
+          # No pre-flight `ssh ... true` here: it was a redundant connectivity
+          # check with no retry, and on an intermittently slow/rate-limited
+          # cPanel host it timed out (~15s) and failed the whole run. The actual
+          # deploy (lftp, below) makes its own connection and retries.
 
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
@@ -109,15 +103,31 @@ jobs:
           # upload from minutes to seconds. No --delete, so (like scp) it only
           # adds/overwrites and never removes — retired pages stay tombstoned via
           # .htaccess. fail-exit makes a partial upload fail the job loudly
-          # instead of half-deploying to the live site.
-          lftp -c "
-            set cmd:fail-exit yes;
-            set net:max-retries 2;
-            set net:timeout 20;
-            set mirror:parallel-transfer-count 10;
-            set sftp:auto-confirm yes;
-            set sftp:connect-program 'ssh -a -x -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -p $SSH_PORT';
-            open -u '$CPANEL_USER,' 'sftp://$CPANEL_HOST';
-            mirror -R out/ '$TARGET/';
-            bye
-          "
+          # instead of half-deploying to the live site. Retried up to 3 times so
+          # an intermittently slow/rate-limited cPanel host doesn't fail the run.
+          attempt=1
+          until [ "$attempt" -gt 3 ]; do
+            echo "Deploy attempt $attempt/3..."
+            if lftp -c "
+              set cmd:fail-exit yes;
+              set net:max-retries 2;
+              set net:timeout 20;
+              set net:connection-limit 10;
+              set mirror:parallel-transfer-count 10;
+              set sftp:auto-confirm yes;
+              set sftp:connect-program 'ssh -a -x -i $HOME/.ssh/id_ed25519 -o IdentitiesOnly=yes -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=30 -p $SSH_PORT';
+              open -u '$CPANEL_USER,' 'sftp://$CPANEL_HOST';
+              mirror -R out/ '$TARGET/';
+              bye
+            "; then
+              echo "Deploy succeeded on attempt $attempt."
+              break
+            fi
+            if [ "$attempt" -ge 3 ]; then
+              echo "Deploy failed after 3 attempts." >&2
+              exit 1
+            fi
+            echo "Attempt $attempt failed; retrying in 15s..." >&2
+            sleep 15
+            attempt=$((attempt + 1))
+          done
