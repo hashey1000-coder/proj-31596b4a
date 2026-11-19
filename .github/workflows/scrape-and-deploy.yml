@@ -77,12 +77,12 @@ jobs:
           printf '%s\n' "$CPANEL_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          for i in 1 2 3; do
-            ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null && break
-            echo "ssh-keyscan attempt $i/3 failed; retrying in 10s..." >&2
-            sleep 10
+          for i in 1 2 3 4 5; do
+            ssh-keyscan -T 20 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null && break
+            echo "ssh-keyscan attempt $i/5 failed; retrying in 30s..." >&2
+            sleep 30
           done
-          grep -q . ~/.ssh/known_hosts || { echo "ssh-keyscan failed after 3 attempts" >&2; exit 1; }
+          grep -q . ~/.ssh/known_hosts || { echo "ssh-keyscan failed after 5 attempts" >&2; exit 1; }
 
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
