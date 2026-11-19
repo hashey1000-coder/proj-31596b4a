@@ -77,11 +77,12 @@ jobs:
           printf '%s\n' "$CPANEL_SSH_KEY" | tr -d '\r' > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
 
-          ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null
-          # No pre-flight `ssh ... true` here: it was a redundant connectivity
-          # check with no retry, and on an intermittently slow/rate-limited
-          # cPanel host it timed out (~15s) and failed the whole run. The actual
-          # deploy (lftp, below) makes its own connection and retries.
+          for i in 1 2 3; do
+            ssh-keyscan -T 15 -p "$SSH_PORT" -H "$CPANEL_HOST" >> ~/.ssh/known_hosts 2>/dev/null && break
+            echo "ssh-keyscan attempt $i/3 failed; retrying in 10s..." >&2
+            sleep 10
+          done
+          grep -q . ~/.ssh/known_hosts || { echo "ssh-keyscan failed after 3 attempts" >&2; exit 1; }
 
       - name: Install lftp
         run: sudo apt-get update -qq && sudo apt-get install -y -qq lftp
