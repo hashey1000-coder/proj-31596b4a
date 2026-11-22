@@ -1,4 +1,5 @@
 import { getAllHospitalsWithWaits, getNationalStats } from "@/lib/data/hospitals";
+import { PageTrust } from "@/components/PageTrust";
 import { HospitalsTable } from "@/components/HospitalsTable";
 import type { Metadata } from "next";
 
@@ -16,6 +17,7 @@ export default function HospitalsPage() {
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
       <HospitalsTable hospitals={hospitals} nationalAvg={nationalAvg} />
+      <PageTrust />
     </div>
   );
 }

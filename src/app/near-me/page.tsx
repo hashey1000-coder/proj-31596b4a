@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getAllHospitalsWithWaits } from "@/lib/data/hospitals";
 import { NearMeClient } from "@/components/NearMeClient";
+import { PageTrust } from "@/components/PageTrust";
 
 export const metadata: Metadata = {
   title: "A&E Near Me — Compare Queues by Distance",
@@ -31,5 +32,12 @@ export default function NearMePage() {
       lng: h.lng!,
     }));
 
-  return <NearMeClient hospitals={hospitals} />;
+  return (
+    <>
+      <NearMeClient hospitals={hospitals} />
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pb-10">
+        <PageTrust className="mt-0" />
+      </div>
+    </>
+  );
 }

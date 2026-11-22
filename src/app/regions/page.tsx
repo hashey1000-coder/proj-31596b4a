@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageTrust } from "@/components/PageTrust";
 import { getRegions } from "@/lib/data/hospitals";
 import type { Metadata } from "next";
 
@@ -44,6 +45,7 @@ export default function RegionsPage() {
           </Link>
         ))}
       </div>
+      <PageTrust />
     </div>
   );
 }

@@ -171,6 +171,26 @@ export function Footer() {
           </div>
         </div>
 
+        {/* Trust & policy links (E-E-A-T) */}
+        <nav
+          aria-label="About and policies"
+          className="py-6 border-t border-white/20 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs text-white/75"
+        >
+          {[
+            { href: "/about", label: "About us" },
+            { href: "/methodology", label: "Methodology" },
+            { href: "/data-sources", label: "Data sources" },
+            { href: "/editorial-policy", label: "Editorial policy" },
+            { href: "/medical-disclaimer", label: "Medical disclaimer" },
+            { href: "/faq", label: "FAQ" },
+            { href: "/contact", label: "Contact" },
+          ].map((l) => (
+            <Link key={l.href} href={l.href} className="hover:text-white transition-colors">
+              {l.label}
+            </Link>
+          ))}
+        </nav>
+
         <div className="py-6 border-t border-white/20 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-white/50">
           <div className="flex flex-wrap items-center gap-4">
             <span>

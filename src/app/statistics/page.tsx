@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageTrust } from "@/components/PageTrust";
 import {
   getNationalStats,
   getLongestWaits,
@@ -234,6 +235,7 @@ export default function StatisticsPage() {
         Data sourced from NHS trust websites. Updated with each page refresh.
         This is an independent service — not affiliated with the NHS.
       </div>
+      <PageTrust />
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageTrust } from "@/components/PageTrust";
 import type { Metadata } from "next";
 import { getAllHospitalsWithWaits } from "@/lib/data/hospitals";
 import { CompareClient, type CompareHospital } from "@/components/CompareClient";
@@ -46,6 +47,7 @@ export default function ComparePage() {
       <div className="mt-8">
         <CompareClient hospitals={hospitals} />
       </div>
+      <PageTrust />
     </div>
   );
 }

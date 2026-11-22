@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageTrust } from "@/components/PageTrust";
 import type { Metadata } from "next";
 import { getAllHospitalsWithWaits } from "@/lib/data/hospitals";
 import { HospitalsMap, type MapHospital } from "@/components/HospitalsMap";
@@ -48,6 +49,7 @@ export default function MapPage() {
         live feed exists, the pin reflects the typical wait from official
         statistics. Map data &copy; OpenStreetMap contributors.
       </p>
+      <PageTrust />
     </div>
   );
 }

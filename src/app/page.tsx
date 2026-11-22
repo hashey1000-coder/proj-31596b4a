@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageTrust } from "@/components/PageTrust";
 import type { Metadata } from "next";
 import {
   getAllHospitalsWithWaits,
@@ -562,6 +563,9 @@ export default function HomePage() {
           }),
         }}
       />
+      <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <PageTrust className="mt-0" />
+      </section>
     </div>
   );
 }

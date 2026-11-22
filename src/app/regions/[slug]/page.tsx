@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { PageTrust } from "@/components/PageTrust";
 import { notFound } from "next/navigation";
 import { getHospitalsByRegion, getRegions, getNationalStats } from "@/lib/data/hospitals";
 import { formatWaitTime, waitSeverity, severityDotColor } from "@/lib/utils";
@@ -152,6 +153,7 @@ export default async function RegionPage({
           );
         })}
       </div>
+      <PageTrust />
     </div>
   );
 }

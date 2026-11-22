@@ -16,6 +16,7 @@ import {
 import { getHospitalImage, optimizedImageUrl } from "@/lib/hospital-images";
 import { HospitalHistory } from "@/components/HospitalHistory";
 import { WaitTrendChart } from "@/components/WaitTrendChart";
+import { PageTrust } from "@/components/PageTrust";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -636,6 +637,7 @@ export default async function HospitalDetailPage({
           </div>
         </div>
       </div>
+      <PageTrust />
     </div>
   );
 }
