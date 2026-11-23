@@ -4,6 +4,7 @@ import { Geist } from "next/font/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { ScrollToTop } from "@/components/ScrollToTop";
+import { CookieConsent } from "@/components/CookieConsent";
 import "./globals.css";
 
 // Google Analytics 4 (measurement ID is public). Placed in the root layout so
@@ -62,6 +63,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {`
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
+
+            // Consent Mode v2: default everything to denied until the visitor
+            // chooses in the cookie banner (UK GDPR/PECR + AdSense requirement).
+            gtag('consent', 'default', {
+              ad_storage: 'denied',
+              analytics_storage: 'denied',
+              ad_user_data: 'denied',
+              ad_personalization: 'denied',
+              wait_for_update: 500
+            });
+
+            // Restore a previous "accept" before the first hit so returning
+            // visitors aren't re-prompted and analytics works immediately.
+            try {
+              if (localStorage.getItem('aewt_consent') === 'granted') {
+                gtag('consent', 'update', {
+                  ad_storage: 'granted',
+                  analytics_storage: 'granted',
+                  ad_user_data: 'granted',
+                  ad_personalization: 'granted'
+                });
+              }
+            } catch (e) {}
+
             gtag('js', new Date());
             gtag('config', '${GA_ID}');
           `}
@@ -70,6 +95,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <main className="flex-1">{children}</main>
         <Footer />
         <ScrollToTop />
+        <CookieConsent />
       </body>
     </html>
   );

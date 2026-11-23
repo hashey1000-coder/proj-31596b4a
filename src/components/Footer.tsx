@@ -182,6 +182,9 @@ export function Footer() {
             { href: "/data-sources", label: "Data sources" },
             { href: "/editorial-policy", label: "Editorial policy" },
             { href: "/medical-disclaimer", label: "Medical disclaimer" },
+            { href: "/privacy-policy", label: "Privacy policy" },
+            { href: "/cookie-policy", label: "Cookie policy" },
+            { href: "/terms", label: "Terms" },
             { href: "/faq", label: "FAQ" },
             { href: "/contact", label: "Contact" },
           ].map((l) => (

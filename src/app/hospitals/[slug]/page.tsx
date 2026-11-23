@@ -17,6 +17,7 @@ import { getHospitalImage, optimizedImageUrl } from "@/lib/hospital-images";
 import { HospitalHistory } from "@/components/HospitalHistory";
 import { WaitTrendChart } from "@/components/WaitTrendChart";
 import { PageTrust } from "@/components/PageTrust";
+import { HOSPITAL_DESCRIPTIONS } from "@/lib/hospital-descriptions";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -104,6 +105,11 @@ export default async function HospitalDetailPage({
     : [];
 
   const hospitalFaqs = generateHospitalFaqs(hospital);
+
+  // Prefer a curated description; otherwise use the generated factual one.
+  const description =
+    hospital.about_text?.trim() || HOSPITAL_DESCRIPTIONS[hospital.slug] || null;
+  const descriptionParas = description ? description.split("\n\n") : [];
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-10">
@@ -320,14 +326,16 @@ export default async function HospitalDetailPage({
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-8">
           {/* About */}
-          {hospital.about_text && (
+          {descriptionParas.length > 0 && (
             <div className="bg-white rounded-2xl border border-gray-200 p-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-3">
                 About {hospital.name}
               </h2>
-              <p className="text-sm text-gray-600 leading-relaxed">
-                {hospital.about_text}
-              </p>
+              <div className="space-y-3 text-sm text-gray-600 leading-relaxed">
+                {descriptionParas.map((para, i) => (
+                  <p key={i}>{para}</p>
+                ))}
+              </div>
             </div>
           )}
 
@@ -644,6 +652,7 @@ export default async function HospitalDetailPage({
 
 function generateHospitalFaqs(hospital: {
   name: string;
+  slug?: string;
   city: string | null;
   wait_minutes: number | null;
   opening_hours: string | null;
@@ -654,15 +663,41 @@ function generateHospitalFaqs(hospital: {
   const deptLabel =
     hospital.type === "UTC" ? "UTC" : hospital.type === "MIU" ? "MIU" : "A&E";
 
+  // Vary question wording per hospital so the 158 pages don't all ask the exact
+  // same questions (the answers are already data-specific). Seeded by slug/name
+  // so it's deterministic across builds.
+  const seedStr = hospital.slug || hospital.name;
+  let seed = 2166136261;
+  for (let i = 0; i < seedStr.length; i++) {
+    seed ^= seedStr.charCodeAt(i);
+    seed = Math.imul(seed, 16777619);
+  }
+  const variant = (options: string[], slot: number) =>
+    options[((seed ^ (slot * 2654435761)) >>> 0) % options.length];
+
   faqs.push({
-    q: `How long is the queue at ${hospital.name} right now?`,
+    q: variant(
+      [
+        `How long is the queue at ${hospital.name} right now?`,
+        `What is the current wait at ${hospital.name}?`,
+        `How busy is ${hospital.name}'s ${deptLabel} at the moment?`,
+      ],
+      1
+    ),
     a: hospital.wait_minutes !== null
       ? `The most recent figure shows roughly ${formatWaitTime(hospital.wait_minutes)} (${hospital.wait_minutes} minutes) at ${hospital.name}'s ${deptLabel}. This is pulled from the trust's public dashboard and refreshes regularly, but the actual time you wait will depend on how urgently you need treatment and how busy the department is when you arrive.`
       : `We do not have a current reading for ${hospital.name}. Try refreshing later, or ring the hospital switchboard for the latest situation.`,
   });
 
   faqs.push({
-    q: `What are ${hospital.name}'s opening hours?`,
+    q: variant(
+      [
+        `What are ${hospital.name}'s opening hours?`,
+        `When is ${hospital.name} open?`,
+        `Is ${hospital.name}'s ${deptLabel} open 24 hours?`,
+      ],
+      2
+    ),
     a: hospital.opening_hours?.includes("24")
       ? `The ${deptLabel} at ${hospital.name} runs around the clock — 24 hours, seven days a week, bank holidays included. No appointment is needed; patients are assessed on arrival and seen in order of clinical urgency, not arrival time.`
       : `${hospital.name} is open: ${hospital.opening_hours || "contact the hospital for confirmed hours"}. If you need care outside those hours, dial 111 for advice on the nearest open department.`,
@@ -676,12 +711,26 @@ function generateHospitalFaqs(hospital: {
   }
 
   faqs.push({
-    q: `How do I get to ${hospital.name}?`,
+    q: variant(
+      [
+        `How do I get to ${hospital.name}?`,
+        `Where is ${hospital.name}?`,
+        `What is the address for ${hospital.name}?`,
+      ],
+      3
+    ),
     a: `${hospital.name} is in ${hospital.city || "the local area"}${hospital.postcode ? `, postcode ${hospital.postcode}` : ""}. Use the location search on this site to see the distance from where you are and compare it against other departments nearby.`,
   });
 
   faqs.push({
-    q: `When is ${hospital.name} ${deptLabel} typically quietest?`,
+    q: variant(
+      [
+        `When is ${hospital.name} ${deptLabel} typically quietest?`,
+        `What is the best time to go to ${hospital.name}?`,
+        `When is ${hospital.name} least busy?`,
+      ],
+      4
+    ),
     a: `Nationally, emergency departments see the fewest arrivals between about 6 am and 9 am. Demand tends to peak on Monday mornings, weekday evenings after 6 pm, and on Friday and Saturday nights. Arriving during a quieter window — if your condition allows it — can noticeably cut the time you spend waiting.`,
   });
 
