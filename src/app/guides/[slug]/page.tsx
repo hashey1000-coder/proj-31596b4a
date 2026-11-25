@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getGuideBySlug, GUIDES } from "@/lib/guides";
+import { withAds } from "@/lib/withAds";
+import LkzAd from "@/components/LkzAd";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -63,8 +65,10 @@ export default async function GuidePage({
             </h1>
             <p className="text-gray-600 mb-6">{guide.description}</p>
 
+            <LkzAd unit={1548} name="Top_leaderboard" />
+
             <div className="border-t border-gray-100 pt-6 guide-content">
-              <div dangerouslySetInnerHTML={{ __html: markdownToHtml(guide.content) }} />
+              <div dangerouslySetInnerHTML={{ __html: withAds(markdownToHtml(guide.content)) }} />
             </div>
 
             <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-2 text-xs text-gray-500">

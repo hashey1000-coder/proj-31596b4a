@@ -54,6 +54,17 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en-GB" data-scroll-behavior="smooth" className={`${geistSans.variable} h-full antialiased`}>
+      <head>
+        <link rel="preconnect" href="https://yield.lkz.ai" />
+        <link rel="preconnect" href="https://securepubads.g.doubleclick.net" crossOrigin="anonymous" />
+        <link rel="dns-prefetch" href="//pagead2.googlesyndication.com" />
+        <link rel="dns-prefetch" href="//tpc.googlesyndication.com" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `!function(d,b,c,s,u){c=d.querySelector('link[rel=canonical]');u=String(c&&c.href||location.href||'').split(/[?#]/)[0];s=d.createElement('script');s.async=1;s.src=b+'?u='+encodeURIComponent(u);(d.head||d.documentElement).appendChild(s)}(document,"https://yield.lkz.ai/s/1324.js")`,
+          }}
+        />
+      </head>
       <body className="min-h-full flex flex-col font-sans bg-gray-50 text-gray-900">
         <Script
           src={`https://www.googletagmanager.com/gtag/js?id=${GA_ID}`}

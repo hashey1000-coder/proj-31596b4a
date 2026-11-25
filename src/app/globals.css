@@ -108,3 +108,10 @@ html {
   margin-bottom: 0.25rem;
   list-style-type: circle;
 }
+
+/* Lkz ad units — reserve space to prevent layout shift */
+div[class*="lkz-ad-"]{display:block;width:100%;margin:32px auto;text-align:center;}
+div.lkz-ad-1549,div.lkz-ad-1550,div.lkz-ad-1551{min-height:280px;}
+@media (min-width:768px){
+  div.lkz-ad-1549,div.lkz-ad-1550,div.lkz-ad-1551{min-height:300px;}
+}

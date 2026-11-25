@@ -13,6 +13,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { DemandHeatmap } from "@/components/DemandHeatmap";
 import { FAQ } from "@/components/FAQ";
 import { FAQ_ITEMS } from "@/lib/faq-data";
+import LkzAd from "@/components/LkzAd";
 
 export const metadata: Metadata = {
   alternates: { canonical: "/" },
@@ -141,6 +142,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <LkzAd unit={1548} name="Top_leaderboard" />
+
       {/* How It Works */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
@@ -247,6 +250,8 @@ export default function HomePage() {
         </div>
       </section>
 
+      <LkzAd unit={1549} name="in_content_1" />
+
       {/* Longest Queues */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="flex items-end justify-between mb-6">
@@ -314,6 +319,8 @@ export default function HomePage() {
           ))}
         </div>
       </section>
+
+      <LkzAd unit={1550} name="in_content_2" />
 
       {/* Explore by Area */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -399,6 +406,8 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      <LkzAd unit={1551} name="in_content_3" />
 
       {/* Our Approach */}
       <section
