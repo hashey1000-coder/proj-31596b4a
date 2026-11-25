@@ -1,4 +1,5 @@
 import Link from "next/link";
+import LkzAd from "@/components/LkzAd";
 import type { Metadata } from "next";
 import { SITE_NAME, CONTACT_EMAIL, LAST_REVIEWED_DISPLAY } from "@/lib/site";
 
@@ -25,6 +26,8 @@ export default function AboutPage() {
         it in one place, so you can see how busy emergency departments are before
         you set off.
       </p>
+
+      <LkzAd unit={1548} name="Top_leaderboard" />
 
       <div className="mt-10 space-y-8 text-gray-700 leading-relaxed">
         <section>

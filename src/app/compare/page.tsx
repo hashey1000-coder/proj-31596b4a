@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageTrust } from "@/components/PageTrust";
+import LkzAd from "@/components/LkzAd";
 import type { Metadata } from "next";
 import { getAllHospitalsWithWaits } from "@/lib/data/hospitals";
 import { CompareClient, type CompareHospital } from "@/components/CompareClient";
@@ -43,6 +44,8 @@ export default function ComparePage() {
         and department details side by side. Your selection is saved in the page
         link, so you can share the comparison.
       </p>
+
+      <LkzAd unit={1548} name="Top_leaderboard" />
 
       <div className="mt-8">
         <CompareClient hospitals={hospitals} />

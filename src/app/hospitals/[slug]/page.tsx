@@ -18,6 +18,7 @@ import { HospitalHistory } from "@/components/HospitalHistory";
 import { WaitTrendChart } from "@/components/WaitTrendChart";
 import { PageTrust } from "@/components/PageTrust";
 import { HOSPITAL_DESCRIPTIONS } from "@/lib/hospital-descriptions";
+import LkzAd from "@/components/LkzAd";
 import type { Metadata } from "next";
 
 export function generateStaticParams() {
@@ -322,6 +323,8 @@ export default async function HospitalDetailPage({
         </div>
       </div>
 
+      <LkzAd unit={1548} name="Top_leaderboard" />
+
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column */}
         <div className="lg:col-span-2 space-y-8">
@@ -417,6 +420,8 @@ export default async function HospitalDetailPage({
             </div>
           )}
 
+          <LkzAd unit={1549} name="in_content_1" />
+
           {/* Wait-time trend */}
           <WaitTrendChart readings={trendReadings} hospitalName={hospital.name} />
 
@@ -424,6 +429,8 @@ export default async function HospitalDetailPage({
           {readings.length > 0 && (
             <HospitalHistory readings={readings} hospitalName={hospital.name} />
           )}
+
+          <LkzAd unit={1550} name="in_content_2" />
 
           {/* Regional context */}
           <div className="bg-white rounded-2xl border border-gray-200 p-6">

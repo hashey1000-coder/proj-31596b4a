@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { GUIDES } from "@/lib/guides";
+import LkzAd from "@/components/LkzAd";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -21,6 +22,8 @@ export default function GuidesPage() {
           Straightforward answers to the questions people ask before, during and after an A&E visit. Written independently, checked against NHS sources and refreshed on a regular cycle.
         </p>
       </div>
+
+      <LkzAd unit={1548} name="Top_leaderboard" />
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {GUIDES.map((guide) => (

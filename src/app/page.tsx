@@ -142,7 +142,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <LkzAd unit={1548} name="Top_leaderboard" />
+      <LkzAd unit={1548} name="Top_leaderboard" container />
 
       {/* How It Works */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -250,7 +250,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <LkzAd unit={1549} name="in_content_1" />
+      <LkzAd unit={1549} name="in_content_1" container />
 
       {/* Longest Queues */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -320,7 +320,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <LkzAd unit={1550} name="in_content_2" />
+      <LkzAd unit={1550} name="in_content_2" container />
 
       {/* Explore by Area */}
       <section className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
@@ -407,7 +407,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <LkzAd unit={1551} name="in_content_3" />
+      <LkzAd unit={1551} name="in_content_3" container />
 
       {/* Our Approach */}
       <section

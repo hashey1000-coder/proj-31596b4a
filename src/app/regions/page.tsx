@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageTrust } from "@/components/PageTrust";
+import LkzAd from "@/components/LkzAd";
 import { getRegions } from "@/lib/data/hospitals";
 import type { Metadata } from "next";
 
@@ -29,6 +30,8 @@ export default function RegionsPage() {
         Select a region to see current A&E waiting times at NHS hospitals in
         that area.
       </p>
+
+      <LkzAd unit={1548} name="Top_leaderboard" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {regions.map((r) => (

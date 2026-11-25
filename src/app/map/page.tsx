@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageTrust } from "@/components/PageTrust";
+import LkzAd from "@/components/LkzAd";
 import type { Metadata } from "next";
 import { getAllHospitalsWithWaits } from "@/lib/data/hospitals";
 import { HospitalsMap, type MapHospital } from "@/components/HospitalsMap";
@@ -39,6 +40,8 @@ export default function MapPage() {
         {hospitals.length} departments across the UK, each pin coloured by its
         current wait. Tap a pin for the latest figure and a link to its page.
       </p>
+
+      <LkzAd unit={1548} name="Top_leaderboard" />
 
       <div className="mt-8">
         <HospitalsMap hospitals={hospitals} />

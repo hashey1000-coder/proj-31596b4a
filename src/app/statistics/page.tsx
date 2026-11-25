@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageTrust } from "@/components/PageTrust";
+import LkzAd from "@/components/LkzAd";
 import {
   getNationalStats,
   getLongestWaits,
@@ -78,6 +79,8 @@ export default function StatisticsPage() {
         </div>
       </div>
 
+      <LkzAd unit={1548} name="Top_leaderboard" />
+
       {/* Distribution */}
       <div className="bg-white rounded-2xl border border-gray-200 p-6">
         <h2 className="text-lg font-bold text-gray-900 mb-1">Wait Time Distribution</h2>
@@ -144,6 +147,8 @@ export default function StatisticsPage() {
           </div>
         </div>
       )}
+
+      <LkzAd unit={1549} name="in_content_1" />
 
       {/* Shortest & Longest Tables */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

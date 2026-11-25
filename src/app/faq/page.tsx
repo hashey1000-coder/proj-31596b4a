@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { FAQ } from "@/components/FAQ";
+import LkzAd from "@/components/LkzAd";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -29,6 +30,8 @@ export default function FAQPage() {
           .
         </p>
       </div>
+
+      <LkzAd unit={1548} name="Top_leaderboard" />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2">

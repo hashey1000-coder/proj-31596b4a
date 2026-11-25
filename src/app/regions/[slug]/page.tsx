@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageTrust } from "@/components/PageTrust";
+import LkzAd from "@/components/LkzAd";
 import { notFound } from "next/navigation";
 import { getHospitalsByRegion, getRegions, getNationalStats } from "@/lib/data/hospitals";
 import { formatWaitTime, waitSeverity, severityDotColor } from "@/lib/utils";
@@ -91,6 +92,8 @@ export default async function RegionPage({
           Region average: <strong>{formatWaitTime(avgWait)}</strong>
         </p>
       )}
+
+      <LkzAd unit={1548} name="Top_leaderboard" />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {sorted.map((hospital) => {
